@@ -1,0 +1,16 @@
+generated: '2026-07-19'
+method: derived
+source: openapi/element5-openapi-original.json
+summary:
+  types:
+  - apiKey
+  api_key_in:
+  - header
+schemes:
+- name: ApiKeyAuth
+  type: apiKey
+  in: header
+  parameter: X-API-Key
+  description: API key provided by Element5 to authenticate and authorize the Element5 APIs
+  sources:
+  - openapi/element5-openapi-original.json
