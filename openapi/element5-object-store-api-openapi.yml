@@ -1,0 +1,225 @@
+openapi: 3.1.0
+info:
+  title: Element5 Authorization Object Store API
+  description: 'Element5 APIs enables the clients to invoke and monitor Element5 Workflows. The E5 APIs are protected by API keys and the keys would be shared during the onboarding process. Due to the long running nature of workflows the current state of the workflows can be tracked either by polling E5 APIs for status or exposing a webhook which will be notified about progress. The below sections highlight the APIs and events which would be relevant for the current engagement.
+
+
+    # Authentication
+
+
+    <!-- ReDoc-Inject: <security-definitions> -->'
+  contact:
+    email: apisupport@e5.ai
+  version: 2.2.0
+  x-logo:
+    url: https://cdn.prod.website-files.com/658c60c4ff902effa2174f77/668c43e2bfb9956a2995b419_e5-logo-gradient.png
+    altText: Element5
+    href: https://e5.ai
+servers:
+- url: https://api-qa.e5.ai
+  description: Non-Production Server
+- url: https://api.e5.ai
+  description: Production Server
+security:
+- ApiKeyAuth: []
+tags:
+- name: Object Store
+  description: Object Store related APIs
+paths:
+  /store/v1/file-object/{object-id}:
+    get:
+      tags:
+      - Object Store
+      servers:
+      - url: https://blob-qa.e5.ai
+        description: Non-Production Server
+      - url: https://blob.e5.ai
+        description: Production Server
+      summary: Fetch the file object
+      description: Fetch a file object by its `object-id`. The file may be delivered directly as binary content or via a redirect to a pre-signed URL.
+      operationId: getFileObject
+      parameters:
+      - name: object-id
+        in: path
+        description: Provide a `object-id` to fetch the file object
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: File object delivered directly as binary content
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        '302':
+          description: File delivered via redirect to a pre-signed URL. The `Location` header contains the pre-signed URL where the file can be accessed.
+          headers:
+            Location:
+              description: Pre-signed URL to access the file
+              schema:
+                type: string
+                format: uri
+        '401':
+          description: API key is missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError'
+        '403':
+          description: Access forbidden. The API key is valid but does not have permission to access this file object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+        '404':
+          description: File not available
+      security:
+      - ApiKeyAuth: []
+  /store/v1/file-object:
+    put:
+      tags:
+      - Object Store
+      servers:
+      - url: https://blob-qa.e5.ai
+        description: Non-Production Server
+      - url: https://blob.e5.ai
+        description: Production Server
+      summary: Upload a file object
+      description: Upload a file to S3 storage. The file is stored in a date-based folder structure (YYYY/MM/DD). Returns file object ID and download URL. Requires `file:write` scope in the authorization token.
+      operationId: uploadFileObject
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: File to upload
+      responses:
+        '201':
+          description: File uploaded successfully
+          headers:
+            Location:
+              description: The URL to access the uploaded file object resource
+              schema:
+                type: string
+                format: uri
+              example: https://blob.e5.ai/store/v1/file-object/550e8400-e29b-41d4-a716-446655440000
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileUploadSuccessResponse'
+        '400':
+          description: Bad request - invalid file or missing data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileUploadBadRequestError'
+        '401':
+          description: Unauthorized - invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError'
+        '403':
+          description: Forbidden - insufficient permissions or client not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+        '413':
+          description: Payload too large - file exceeds maximum size
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileUploadPayloadTooLargeError'
+      security:
+      - BearerAuth: []
+components:
+  schemas:
+    FileUploadPayloadTooLargeError:
+      type: object
+      description: File upload Payload Too Large Error Response
+      properties:
+        code:
+          type: string
+          description: Error code
+          example: '413'
+        message:
+          type: string
+          description: Error message
+          example: Payload too large - file exceeds maximum size
+      example:
+        code: '413'
+        message: Payload too large - file exceeds maximum size
+    AuthorizationError:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '403'
+        message:
+          type: string
+          example: Access forbidden. The API key is valid but does not have permission to access this resource.
+    FileUploadBadRequestError:
+      type: object
+      description: File upload Bad Request Error Response
+      properties:
+        code:
+          type: string
+          description: Error code
+          example: '400'
+        message:
+          type: string
+          description: Error message
+          example: Bad request - the uploaded file is invalid or missing required data
+      example:
+        code: '400'
+        message: Bad request - the uploaded file is invalid or missing required data
+    FileUploadSuccessResponse:
+      type: object
+      description: File upload Success Response
+      properties:
+        fileObjectId:
+          type: string
+          format: uuid
+          description: File object ID
+          example: 550e8400-e29b-41d4-a716-446655440000
+        downloadUrl:
+          type: string
+          description: Unique URL to access the uploaded file
+          example: https://blob.e5.ai/store/v1/file-object/550e8400-e29b-41d4-a716-446655440000
+    AuthError:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '401'
+        message:
+          type: string
+          example: API key is missing or invalid
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      description: API key provided by Element5 to authenticate and authorize the Element5 APIs
+      name: X-API-Key
+      in: header
+x-tagGroups:
+- name: Core
+  tags:
+  - Automation
+  - Object Store
+- name: Micro Verticals
+  tags:
+  - Authorization
+  - Eligibility

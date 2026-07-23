@@ -1,0 +1,911 @@
+openapi: 3.1.0
+info:
+  title: Element5 Authorization API
+  description: 'Element5 APIs enables the clients to invoke and monitor Element5 Workflows. The E5 APIs are protected by API keys and the keys would be shared during the onboarding process. Due to the long running nature of workflows the current state of the workflows can be tracked either by polling E5 APIs for status or exposing a webhook which will be notified about progress. The below sections highlight the APIs and events which would be relevant for the current engagement.
+
+
+    # Authentication
+
+
+    <!-- ReDoc-Inject: <security-definitions> -->'
+  contact:
+    email: apisupport@e5.ai
+  version: 2.2.0
+  x-logo:
+    url: https://cdn.prod.website-files.com/658c60c4ff902effa2174f77/668c43e2bfb9956a2995b419_e5-logo-gradient.png
+    altText: Element5
+    href: https://e5.ai
+servers:
+- url: https://api-qa.e5.ai
+  description: Non-Production Server
+- url: https://api.e5.ai
+  description: Production Server
+security:
+- ApiKeyAuth: []
+tags:
+- name: Authorization
+  description: Authorization related APIs
+paths:
+  /wf/v2/workflows/submit-authorization:
+    post:
+      tags:
+      - Authorization
+      summary: Authorization Submission Request (Draft)
+      operationId: submitAuthorizationRequest
+      description: All the necessary information required to submit an authorization. On receipt, the API performs a quick validation (not verification) of the request for correctness. On successful validation returns a `taskId` which can be used for tracking this request. Also, the `task#queued` event is triggered.
+      requestBody:
+        description: Submit Authorization Request Body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitAuthorizationRequest'
+      responses:
+        '200':
+          description: Submit Authorization Request Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskRequestSuccessResponse_Authorization'
+        '400':
+          description: Submit Authorization Request Failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskRequestFailedResponse'
+        '401':
+          description: API key is missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError'
+        '403':
+          description: Access forbidden. The API key is valid but does not have permission to access this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+      security:
+      - ApiKeyAuth: []
+  /wf/v2/workflows/submit-authorization/{task-id}:
+    get:
+      tags:
+      - Authorization
+      summary: Authorization Submission Request Status
+      description: Fetch the current status of a Authorization Submission Request. It takes the `taskId`, provided by the Authorization Submission Request, as input.
+      operationId: getSubmitAuthorizationRequestStatus
+      parameters:
+      - name: task-id
+        in: path
+        description: Provide a task id to retreive the Authorization Submission Request status
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Status of a Authorization Submission Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_authorization'
+        '401':
+          description: API key is missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError'
+        '403':
+          description: Access forbidden. The API key is valid but does not have permission to access this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+      security:
+      - ApiKeyAuth: []
+components:
+  schemas:
+    SubmitAuthorizationProgress:
+      type: object
+      properties:
+        submitAuthorization:
+          $ref: '#/components/schemas/SubmitAuthorizationProgress_submitAuthorization'
+    TaskProgressed_Authorization:
+      title: TaskProgressed
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_Authorization'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Processing'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+        taskPayload:
+          $ref: '#/components/schemas/AuthorizationTaskProgresses'
+    AuthorizationError:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '403'
+        message:
+          type: string
+          example: Access forbidden. The API key is valid but does not have permission to access this resource.
+    TaskStatus_Failed:
+      type: string
+      enum:
+      - failed
+    TaskRestarted_Authorization:
+      type: object
+      title: TaskRestarted
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_Authorization'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Processing'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+    AuthError:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '401'
+        message:
+          type: string
+          example: API key is missing or invalid
+    TaskStarted_Authorization:
+      type: object
+      title: TaskStarted
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_Authorization'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Processing'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+          example: 1
+    SubmitAuthorizationFailure_submitAuthorization:
+      type: object
+      properties:
+        failureReason:
+          type: string
+    SubmitAuthorizationFailure:
+      type: object
+      properties:
+        submitAuthorization:
+          $ref: '#/components/schemas/SubmitAuthorizationFailure_submitAuthorization'
+    AuthorizationTaskSuccesses:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitAuthorizationSuccess'
+    TaskSucceeded_Authorization:
+      type: object
+      title: TaskSucceeded
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_Authorization'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Success'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        endedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+        taskPayload:
+          $ref: '#/components/schemas/AuthorizationTaskSuccesses'
+    SubmitAuthorizationSuccess:
+      type: object
+      properties:
+        submitAuthorization:
+          $ref: '#/components/schemas/SubmitAuthorizationSuccessResponse'
+    SubmitAuthorizationSuccessResponse:
+      type: object
+      properties:
+        authResponse:
+          $ref: '#/components/schemas/AuthResponse'
+    AuthorizationTaskFailures:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitAuthorizationFailure'
+    SubmitAuthorizationProgress_submitAuthorization:
+      type: object
+      properties:
+        progress:
+          type: string
+    TaskStatus_Queued:
+      type: string
+      enum:
+      - queued
+    TaskName_Authorization:
+      type: string
+      title: TaskName
+      enum:
+      - submit-authorization
+    DateString:
+      type: string
+      description: Date and time in ISO8601 format
+      format: date-time
+      example: '2017-07-21T17:32:28Z'
+    SubmitAuthorizationRequestPayload:
+      type: object
+      properties:
+        senderDetails:
+          type: object
+          properties:
+            partnerName:
+              type: string
+              description: Partner entity Name
+              example: Wellsky
+            organizationName:
+              type: string
+              description: Organization/Corporation name of the entity requesting the service
+              example: 11111-Affinity
+            agencyName:
+              type: string
+              description: Agency/Clinic name associated to the service
+              example: Polk
+            branchName:
+              type: string
+              description: Branch name associated to the service
+              example: Branch1
+          required:
+          - partnerName
+          - organizationName
+          - agencyName
+          - branchName
+        patientDetails:
+          type: object
+          description: Patient Details
+          properties:
+            patientId:
+              type: string
+              description: 'Patient Unique ID - Eg: Medical Record number'
+              example: BOX00003977
+            firstName:
+              type: string
+              description: Patient first name
+              maxLength: 50
+              minLength: 1
+              example: John
+            lastName:
+              type: string
+              description: Patient last name
+              maxLength: 50
+              minLength: 1
+              example: Smith
+            middleName:
+              type: string
+              description: Patient middle name
+              example: Edward
+              maxLength: 50
+              minLength: 1
+            dateOfBirth:
+              type: string
+              format: date
+              description: Patient Date of Birth. Date in ISO8601 format (YYYY-MM-DD)
+              example: '1980-12-20'
+            gender:
+              type: string
+              description: Patient Gender
+              enum:
+              - M
+              - F
+              example: M
+            startOfCareDate:
+              type: string
+              format: date
+              description: Patient care episode/service start date. Date in ISO8601 format (YYYY-MM-DD)
+              example: '2025-12-20'
+            patientAddress:
+              type: object
+              description: Patient Address
+              properties:
+                addressLine1:
+                  type: string
+                  description: Patient Address 1
+                  example: 123 Broadway St
+                addressLine2:
+                  type: string
+                  description: Patient Address 2
+                  example: Apt 2
+                city:
+                  type: string
+                  description: Patient City
+                  example: Dallas
+                state:
+                  type: string
+                  description: Patient state code - Eg:TX for Texas
+                  example: TX
+                zip:
+                  type: string
+                  description: Patient Zip (NNNNN or NNNNN-NNNN)
+                  pattern: ^\d{5}(-\d{4})?$
+                  example: '75001'
+              required:
+              - addressLine1
+              - city
+              - state
+              - zip
+          required:
+          - patientId
+          - firstName
+          - lastName
+          - dateOfBirth
+          - startOfCareDate
+          - patientAddress
+        episodeDetails:
+          type: object
+          description: Episode Details
+          properties:
+            episodeId:
+              type: string
+              description: Unique number to identify patient episode
+              example: '11111111'
+            soeDate:
+              type: string
+              format: date
+              description: Start of Episode. Date in ISO8601 format (YYYY-MM-DD)
+              example: '2025-12-20'
+            eoeDate:
+              type: string
+              format: date
+              description: End of Episode. Date in ISO8601 format (YYYY-MM-DD)
+              example: '2026-02-20'
+          required:
+          - soeDate
+          - eoeDate
+          - episodeId
+        payerDetails:
+          type: object
+          description: Payer Details
+          properties:
+            payerName:
+              type: string
+              description: Payer Name
+              example: UHC
+            payerPlanName:
+              type: string
+              description: Payer Plan name of the patient as in EHR
+              example: AARP® Medicare Advantage from UnitedHealthcare
+            payerType:
+              type: string
+              description: Payer type of the patient as in EHR
+              example: MA
+            payerId:
+              type: string
+              description: Payer ID of associated payer
+              example: '87726'
+            payerHierarchy:
+              type: string
+              description: Indicates whether the insurance is Primary, Secondary, or Tertiary (P/S/T)
+              enum:
+              - Primary
+              - Secondary
+              - Tertiary
+              example: Primary
+            memberId:
+              type: string
+              description: Member identification number/payer policy number
+              example: W9837639
+            MBI:
+              type: string
+              description: Medicare beneficiary ID, if Medicare patients
+              example: 3FH9AA4K221
+              pattern: ^[1-9][A-Z0-9]{2}[A-Z]{0,1}[A-Z0-9]{0,1}[0-9]{0,1}[A-Z0-9]{5}[A-Z0-9]{1}[A-Z0-9]{1}[A-Z0-9]{2}$
+            medicaidId:
+              type: string
+              description: Medicaid ID, if applicable
+              example: '500123456789'
+            gatewayName:
+              type: string
+              description: Name of the gateway in which the request will be sent to
+              example: Availity
+          required:
+          - payerPlanName
+          - memberId
+        servicingProviderDetails:
+          type: object
+          description: Branch/Clinic details based on the records location
+          properties:
+            serviceLine:
+              type: string
+              description: Service line of which authorization is being requested for
+              example: Home Health
+            branch:
+              type: string
+              description: Branch Name submitting the request
+              example: Sunshine Healthcare
+            branchNPI:
+              type: string
+              description: Branch NPI submitting the request
+              pattern: ^\d{10}$
+              example: '1427683941'
+            branchAddress:
+              type: object
+              description: Branch Address
+              properties:
+                addressLine1:
+                  type: string
+                  description: Branch Address 1
+                  example: 123 Main St
+                addressLine2:
+                  type: string
+                  description: Branch Address 2
+                city:
+                  type: string
+                  description: Branch City
+                  example: Dallas
+                state:
+                  type: string
+                  description: Branch State code - Eg:TX for Texas
+                  example: TX
+                zip:
+                  type: string
+                  description: Branch Zip (NNNNN or NNNNN-NNNN)
+                  pattern: ^\d{5}(-\d{4})?$
+                  example: '75001'
+          required:
+          - branch
+          - branchNPI
+        orderingProviderDetails:
+          type: object
+          description: Ordering provider details
+          properties:
+            orderingProviderFirstName:
+              type: string
+              description: First name of the Physician who ordered this service
+              example: John
+            orderingProviderLastName:
+              type: string
+              description: Last name of the Physician who ordered this service
+              example: Smith
+            orderingProviderNPI:
+              type: string
+              description: NPI of the Physician ordering this service
+              pattern: ^\d{10}$
+              example: '1223455250'
+            orderingProviderAddress:
+              type: object
+              description: Address of the Physician ordering this service
+              properties:
+                addressLine1:
+                  type: string
+                  description: Ordering provider Address 1
+                  example: 123 Main St
+                addressLine2:
+                  type: string
+                  description: Ordering provider Address 2
+                city:
+                  type: string
+                  description: Ordering provider City
+                  example: Dallas
+                state:
+                  type: string
+                  description: Ordering provider State code - Eg:TX for Texas
+                  example: TX
+                zip:
+                  type: string
+                  description: Ordering provider Zip (NNNNN or NNNNN-NNNN)
+                  pattern: ^\d{5}(-\d{4})?$
+                  example: '75001'
+          required:
+          - orderingProviderNPI
+          - orderingProviderFirstName
+          - orderingProviderLastName
+        referralInformation:
+          type: object
+          description: Patients Referral information
+          properties:
+            referralSource:
+              type: string
+              description: Referring source (Hospital/Physician/SNF)
+              enum:
+              - HOSPITAL
+              - PHYSICIAN
+              - SNF
+              example: PHYSICIAN
+            referringSourceName:
+              type: string
+              description: Facility or Physician who placed the referral
+              example: Michael Scott
+            facilityDischargeDate:
+              type: string
+              format: date
+              description: Date in which the patient was discharged from a facility; applicable when referring source is a facility; Mandatory when referral source is facility. Date in ISO8601 format (YYYY-MM-DD)
+              example: '2025-12-20'
+          required:
+          - referralSource
+          - referringSourceName
+          - facilityDischargeDate
+        authorizationRequest:
+          type: object
+          description: Authorization Request Details
+          properties:
+            authType:
+              type: string
+              description: Auth type - Initial, Recert, Additional
+              enum:
+              - Initial
+              - Recert
+              - Additional
+              example: Initial
+            authRequestDetails:
+              type: array
+              description: Discipline level request details
+              items:
+                properties:
+                  serviceDiscipline:
+                    type: string
+                    description: Discipline requiring request
+                    enum:
+                    - SN
+                    - PT
+                    - OT
+                    - MSW
+                    - HHA
+                    - ST
+                    - LPN
+                    example: SN
+                  procedureCodes:
+                    type: string
+                    description: Procedure Codes per discipline based on portal
+                    example: G0299, G0151, S9123, T1030
+                  requestedQty:
+                    type: integer
+                    description: Total quantity (visits) to be requested for the given service discipline
+                    minimum: 1
+                    example: 10
+                  requestedStartDate:
+                    type: string
+                    format: date
+                    description: Start Date for discipline for which auth is requested; SOE will be used as priority based on payer/plan/auth type. Date in ISO8601 format (YYYY-MM-DD)
+                    example: '2025-12-20'
+                  requestedEndDate:
+                    type: string
+                    format: date
+                    description: End Date for discipline for which auth is requested; EOE will be used as priority based on payer/plan/auth type. Date in ISO8601 format (YYYY-MM-DD)
+                    example: '2025-12-27'
+                required:
+                - serviceDiscipline
+                - requestedQty
+                - requestedStartDate
+                - requestedEndDate
+          required:
+          - authType
+          - authRequestDetails
+        diagnosisDetails:
+          type: array
+          description: Diagnosis Details
+          items:
+            type: object
+            properties:
+              diagnosisCode:
+                type: string
+                description: Diagnosis code submitted as part of Auth (ICD codes)
+                example: J44.9
+              sortOrder:
+                type: integer
+                description: Diagnosis code order
+                minimum: 1
+                example: 1
+            minItems: 1
+            maxItems: 4
+            required:
+            - diagnosisCode
+            - sortOrder
+        attachments:
+          type: array
+          description: List of attachments
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+                description: URL of a file which would be attached submitted as part of authorization request. Need creds for accessing SFTP (userID/pwd or token). Whitelisting will also be needed.
+              attachmentType:
+                type: string
+                description: Type of the attachment
+              attachmentName:
+                type: string
+                description: Name of the attachment
+      required:
+      - patientDetails
+      - episodeDetails
+      - payerDetails
+      - servicingProviderDetails
+      - orderingProviderDetails
+      - referralInformation
+      - authorizationRequest
+      - diagnosisDetails
+      - senderDetails
+    inline_response_200_authorization:
+      oneOf:
+      - $ref: '#/components/schemas/TaskStarted_Authorization'
+      - $ref: '#/components/schemas/TaskQueued_Authorization'
+      - $ref: '#/components/schemas/TaskRestarted_Authorization'
+      - $ref: '#/components/schemas/TaskProgressed_Authorization'
+      - $ref: '#/components/schemas/TaskSucceeded_Authorization'
+      - $ref: '#/components/schemas/TaskFailed_Authorization'
+    TaskStatus_Processing:
+      type: string
+      enum:
+      - processing
+    TaskQueued_Authorization:
+      type: object
+      title: TaskQueued
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_Authorization'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Queued'
+    AuthorizationTaskProgresses:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitAuthorizationProgress'
+    SubmitAuthorizationRequest:
+      required:
+      - taskPayload
+      type: object
+      properties:
+        taskPayload:
+          $ref: '#/components/schemas/SubmitAuthorizationRequestPayload'
+    TaskRequestSuccessResponse_Authorization:
+      type: object
+      title: TaskRequestSuccessResponse
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_Authorization'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Queued'
+      description: Task Request has succeeded
+    TaskStatus_Success:
+      type: string
+      enum:
+      - success
+    TaskFailed_Authorization:
+      type: object
+      title: TaskFailed
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_Authorization'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Failed'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        endedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+        taskPayload:
+          $ref: '#/components/schemas/AuthorizationTaskFailures'
+    AuthResponse:
+      type: object
+      properties:
+        patientDetails:
+          type: object
+          description: Patient Details
+          properties:
+            firstName:
+              type: string
+              description: Patient first name
+              maxLength: 50
+              minLength: 1
+              example: John
+            lastName:
+              type: string
+              description: Patient last name
+              maxLength: 50
+              minLength: 1
+              example: Smith
+            middleName:
+              type: string
+              description: Patient middle name
+              example: Edward
+            patientId:
+              type: string
+              description: 'Patient Unique ID - Eg: Medical Record number'
+              example: BOX00003977
+          required:
+          - firstName
+          - lastName
+          - patientId
+        payerDetails:
+          type: object
+          description: Payer Details
+          properties:
+            memberId:
+              type: string
+              description: Member identification number/payer policy number
+              example: W9837639
+            payerPlanName:
+              type: string
+              description: Payer Plan name of the patient
+              example: AARP® Medicare Advantage from UnitedHealthcare
+            gateway:
+              type: string
+              description: Gateway in which the authorization was submitted
+              example: UHC
+          required:
+          - memberId
+          - payerPlanName
+          - gateway
+        authorizationResponse:
+          description: Authorization Response Details
+          type: object
+          properties:
+            authNumber:
+              type: string
+              description: Authorization number returned from the payer after the request is placed
+            authStatus:
+              type: string
+              description: Status of the overall authorization request
+              enum:
+              - PENDING
+              - APPROVED
+              - DENIED
+              - PARTIALLY APPROVED
+              - EXCEPTION
+              example: PENDING
+            lastStatusCheck:
+              type: string
+              format: date
+              description: Timestamp of the last attempt to submit or check the authorization in the portal. Date in ISO8601 format (YYYY-MM-DD)
+              example: '2025-05-26'
+            payerResponseDate:
+              type: string
+              format: date
+              description: Date in which the payer gave a response of the request that is no longer pending. Date in ISO8601 format (YYYY-MM-DD)
+              example: '2025-07-30'
+            services:
+              type: array
+              description: Discipline level Auth response details
+              items:
+                type: object
+                properties:
+                  serviceDiscipline:
+                    type: string
+                    description: Discipline requested
+                    enum:
+                    - SN
+                    - PT
+                    - OT
+                    - MSW
+                    - HHA
+                    - ST
+                    - LPN
+                    example: SN
+                  disciplineAuthStatus:
+                    type: string
+                    description: Auth status of the unique requested discipline
+                    enum:
+                    - PENDING
+                    - APPROVED
+                    - DENIED
+                    - PARTIALLY APPROVED
+                    - EXCEPTION
+                    example: PENDING
+                  disciplineAuthNumber:
+                    type: string
+                    description: Authorization Number associated with the unique discipline for the authorization request
+                    example: A2344222333
+                  requestedUnits:
+                    type: integer
+                    description: Total qty requested for the unique discipline
+                    example: 10
+                  approvedUnits:
+                    type: integer
+                    description: Total visits approved for the unique discipline
+                    example: 5
+                  deniedUnits:
+                    type: integer
+                    description: Total visits denied for the unique discipline
+                    example: 3
+                  pendingUnits:
+                    type: integer
+                    description: Total visits pending for the unique discipline
+                    example: 2
+                  authStartDate:
+                    type: string
+                    format: date
+                    description: Authorization start date for the discipline - requested start date/approved start date. Date in ISO8601 format (YYYY-MM-DD)
+                    example: '2025-05-26'
+                  authEndDate:
+                    type: string
+                    format: date
+                    description: Authorization end date for the discipline - requested end date/approved end date. Date in ISO8601 format (YYYY-MM-DD)
+                    example: '2025-07-30'
+                  denialReason:
+                    type: string
+                    description: Reason provided for denial, if applicable
+            authResponseDocs:
+              type: array
+              description: Documents which are received as part of the Authorization Response
+              items:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    description: URL of a file which would be attached submitted as part of authorization request. Need creds for accessing SFTP (userID/pwd or token). Whitelisting will also be needed.
+                  attachmentType:
+                    type: string
+                    description: Type of the attachment
+                  attachmentName:
+                    type: string
+                    description: Name of the attachment
+            authExceptions:
+              type: string
+              description: Exceptions encountered during auth submission or retrieval process
+          required:
+          - authStatus
+      required:
+      - patientDetails
+      - payerDetails
+      - authorizationResponse
+    TaskID:
+      type: string
+      format: uuid
+      example: 55dfe5e9-725a-4ce0-ba41-925e588623c2
+    TaskRequestFailedResponse:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/TaskStatus_Failed'
+        reason:
+          type: string
+      description: Task Request has failed
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      description: API key provided by Element5 to authenticate and authorize the Element5 APIs
+      name: X-API-Key
+      in: header
+x-tagGroups:
+- name: Core
+  tags:
+  - Automation
+  - Object Store
+- name: Micro Verticals
+  tags:
+  - Authorization
+  - Eligibility
