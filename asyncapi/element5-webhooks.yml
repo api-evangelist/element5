@@ -1,0 +1,32 @@
+generated: '2026-07-19'
+method: searched
+source: openapi/element5-openapi-original.json
+spec_type: Webhooks
+transport: http-callback
+description: >-
+  Element5 posts task lifecycle events to a Webhook URL configured during onboarding. Each event is a
+  JSON body carrying eventName, eventId (uuid), createdAt, and an eventPayload describing the task.
+delivery:
+  method: POST
+  target: client-configured webhook URL (set at onboarding)
+  content_type: application/json
+envelope:
+  fields:
+  - eventName
+  - eventId
+  - createdAt
+  - eventPayload
+events:
+- name: task#queued
+  description: A submitted task has been accepted and queued for processing.
+- name: task#started
+  description: Processing of the task has begun.
+- name: task#restarted
+  description: Processing of the task has been restarted.
+- name: task#progressed
+  description: The task has advanced to a new progress checkpoint.
+- name: task#succeeded
+  description: The task completed successfully; results are available via the status endpoint.
+- name: task#failed
+  description: The task failed; a failure reason is provided.
+source_operation: openapi/element5-openapi-original.json#E5TaskEvent

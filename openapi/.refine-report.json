@@ -1,0 +1,18 @@
+{
+  "provider": "element5",
+  "sources": [
+    "element5-authorization-api-openapi.yml",
+    "element5-eligibility-api-openapi.yml",
+    "element5-object-store-api-openapi.yml"
+  ],
+  "outputs": [
+    "element5-authorization-api-openapi.yml",
+    "element5-eligibility-api-openapi.yml",
+    "element5-object-store-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}

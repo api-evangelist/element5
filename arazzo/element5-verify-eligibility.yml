@@ -1,0 +1,36 @@
+arazzo: 1.0.1
+info:
+  title: Element5 — Verify eligibility and await result
+  version: 1.0.0
+  description: Submit an eligibility request and poll until the task succeeds or fails.
+sourceDescriptions:
+- name: element5
+  url: ../openapi/element5-openapi-original.json
+  type: openapi
+workflows:
+- workflowId: verifyEligibility
+  summary: Submit an eligibility request, then poll its task status to completion.
+  inputs:
+    type: object
+    properties:
+      apiKey:
+        type: string
+      payload:
+        type: object
+  steps:
+  - stepId: submit
+    operationId: submitEligibilityRequest
+    requestBody:
+      payload: $inputs.payload
+    outputs:
+      taskId: $response.body#/taskId
+  - stepId: checkStatus
+    operationId: getSubmitEligibilityRequestStatus
+    parameters:
+    - name: task-id
+      in: path
+      value: $steps.submit.outputs.taskId
+    outputs:
+      status: $response.body#/status
+  outputs:
+    status: $steps.checkStatus.outputs.status

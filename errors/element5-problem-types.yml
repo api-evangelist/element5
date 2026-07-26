@@ -1,0 +1,47 @@
+generated: '2026-07-19'
+method: derived
+source: openapi/element5-openapi-original.json
+format: custom
+envelope:
+  description: Errors are returned as a JSON object with a string code and a human-readable message.
+  fields:
+  - code
+  - message
+  example:
+    code: '401'
+    message: API key is missing or invalid
+problems:
+- status: 400
+  title: Bad Request
+  description: The request payload was malformed or failed validation.
+  source_operations:
+  - openapi/element5-openapi-original.json#uploadFileObject
+  - openapi/element5-openapi-original.json#submitAuthorizationRequest
+  - openapi/element5-openapi-original.json#submitEligibilityRequest
+- status: 401
+  title: Unauthorized
+  description: API key is missing or invalid (X-API-Key header).
+  remediation: Supply the X-API-Key issued by Element5 during onboarding.
+  source_operations:
+  - openapi/element5-openapi-original.json#getFileObject
+  - openapi/element5-openapi-original.json#uploadFileObject
+  - openapi/element5-openapi-original.json#submitAuthorizationRequest
+  - openapi/element5-openapi-original.json#submitEligibilityRequest
+  - openapi/element5-openapi-original.json#processX12EligibilityTransactionRequest
+- status: 403
+  title: Forbidden
+  description: The API key is valid but not authorized for the requested resource or workflow.
+  source_operations:
+  - openapi/element5-openapi-original.json#getFileObject
+  - openapi/element5-openapi-original.json#submitAuthorizationRequest
+  - openapi/element5-openapi-original.json#submitEligibilityRequest
+- status: 404
+  title: Not Found
+  description: The requested file object could not be found.
+  source_operations:
+  - openapi/element5-openapi-original.json#getFileObject
+- status: 413
+  title: Payload Too Large
+  description: The uploaded file object exceeds the maximum allowed size.
+  source_operations:
+  - openapi/element5-openapi-original.json#uploadFileObject

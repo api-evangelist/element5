@@ -1,0 +1,17 @@
+generated: '2026-07-19'
+method: generated
+source: openapi/element5-openapi-original.json
+skills:
+- file: element5-verify-eligibility.md
+  name: Verify patient eligibility with Element5
+  api: openapi/element5-openapi-original.json
+  operations:
+  - submitEligibilityRequest
+  - getSubmitEligibilityRequestStatus
+- file: element5-submit-authorization.md
+  name: Submit a prior authorization with Element5
+  api: openapi/element5-openapi-original.json
+  operations:
+  - uploadFileObject
+  - submitAuthorizationRequest
+  - getSubmitAuthorizationRequestStatus

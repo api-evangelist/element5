@@ -1,0 +1,4238 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Element5 API",
+    "description": "Element5 APIs enables the clients to invoke and monitor Element5 Workflows. The E5 APIs are protected by API keys and the keys would be shared during the onboarding process. Due to the long running nature of workflows the current state of the workflows can be tracked either by polling E5 APIs for status or exposing a webhook which will be notified about progress. The below sections highlight the APIs and events which would be relevant for the current engagement.\n\n# Authentication\n\n<!-- ReDoc-Inject: <security-definitions> -->",
+    "contact": {
+      "email": "apisupport@e5.ai"
+    },
+    "version": "2.2.0",
+    "x-logo": {
+      "url": "https://cdn.prod.website-files.com/658c60c4ff902effa2174f77/668c43e2bfb9956a2995b419_e5-logo-gradient.png",
+      "altText": "Element5",
+      "href": "https://e5.ai"
+    }
+  },
+  "tags": [
+    {
+      "name": "Automation",
+      "description": "Generic E5 Task related APIs and Webhooks"
+    },
+    {
+      "name": "Object Store",
+      "description": "Object Store related APIs"
+    },
+    {
+      "name": "Authorization",
+      "description": "Authorization related APIs"
+    },
+    {
+      "name": "Eligibility",
+      "description": "Eligibility related APIs"
+    }
+  ],
+  "x-tagGroups": [
+    {
+      "name": "Core",
+      "tags": [
+        "Automation",
+        "Object Store"
+      ]
+    },
+    {
+      "name": "Micro Verticals",
+      "tags": [
+        "Authorization",
+        "Eligibility"
+      ]
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://api-qa.e5.ai",
+      "description": "Non-Production Server"
+    },
+    {
+      "url": "https://api.e5.ai",
+      "description": "Production Server"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/store/v1/file-object/{object-id}": {
+      "get": {
+        "tags": [
+          "Object Store"
+        ],
+        "servers": [
+          {
+            "url": "https://blob-qa.e5.ai",
+            "description": "Non-Production Server"
+          },
+          {
+            "url": "https://blob.e5.ai",
+            "description": "Production Server"
+          }
+        ],
+        "summary": "Fetch the file object",
+        "description": "Fetch a file object by its `object-id`. The file may be delivered directly as binary content or via a redirect to a pre-signed URL.",
+        "operationId": "getFileObject",
+        "parameters": [
+          {
+            "name": "object-id",
+            "in": "path",
+            "description": "Provide a `object-id` to fetch the file object",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File object delivered directly as binary content",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "302": {
+            "description": "File delivered via redirect to a pre-signed URL. The `Location` header contains the pre-signed URL where the file can be accessed.",
+            "headers": {
+              "Location": {
+                "description": "Pre-signed URL to access the file",
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "API key is missing or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access forbidden. The API key is valid but does not have permission to access this file object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorizationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not available"
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/store/v1/file-object": {
+      "put": {
+        "tags": [
+          "Object Store"
+        ],
+        "servers": [
+          {
+            "url": "https://blob-qa.e5.ai",
+            "description": "Non-Production Server"
+          },
+          {
+            "url": "https://blob.e5.ai",
+            "description": "Production Server"
+          }
+        ],
+        "summary": "Upload a file object",
+        "description": "Upload a file to S3 storage. The file is stored in a date-based folder structure (YYYY/MM/DD). Returns file object ID and download URL. Requires `file:write` scope in the authorization token.",
+        "operationId": "uploadFileObject",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "File to upload"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "File uploaded successfully",
+            "headers": {
+              "Location": {
+                "description": "The URL to access the uploaded file object resource",
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "example": "https://blob.e5.ai/store/v1/file-object/550e8400-e29b-41d4-a716-446655440000"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileUploadSuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid file or missing data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileUploadBadRequestError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - invalid or missing token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - insufficient permissions or client not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorizationError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload too large - file exceeds maximum size",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileUploadPayloadTooLargeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/wf/v2/workflows/submit-authorization": {
+      "post": {
+        "tags": [
+          "Authorization"
+        ],
+        "summary": "Authorization Submission Request (Draft)",
+        "operationId": "submitAuthorizationRequest",
+        "description": "All the necessary information required to submit an authorization. On receipt, the API performs a quick validation (not verification) of the request for correctness. On successful validation returns a `taskId` which can be used for tracking this request. Also, the `task#queued` event is triggered.",
+        "requestBody": {
+          "description": "Submit Authorization Request Body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitAuthorizationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Submit Authorization Request Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskRequestSuccessResponse_Authorization"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Submit Authorization Request Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskRequestFailedResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "API key is missing or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access forbidden. The API key is valid but does not have permission to access this resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorizationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/wf/v2/workflows/submit-authorization/{task-id}": {
+      "get": {
+        "tags": [
+          "Authorization"
+        ],
+        "summary": "Authorization Submission Request Status",
+        "description": "Fetch the current status of a Authorization Submission Request. It takes the `taskId`, provided by the Authorization Submission Request, as input.",
+        "operationId": "getSubmitAuthorizationRequestStatus",
+        "parameters": [
+          {
+            "name": "task-id",
+            "in": "path",
+            "description": "Provide a task id to retreive the Authorization Submission Request status",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status of a Authorization Submission Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_authorization"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "API key is missing or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access forbidden. The API key is valid but does not have permission to access this resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorizationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/wf/v2/workflows/submit-eligibility": {
+      "post": {
+        "tags": [
+          "Eligibility"
+        ],
+        "summary": "Eligibility Submission Request",
+        "operationId": "submitEligibilityRequest",
+        "description": "All the necessary information required to submit an eligibility request. On receipt, the API performs a quick validation (not verification) of the request for correctness. On successful validation returns a `taskId` which can be used for tracking this request. Also, the `task#queued` event is triggered.",
+        "requestBody": {
+          "description": "Submit Eligibility Request Body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitEligibilityRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Submit Eligibility Request Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskRequestSuccessResponse_Eligibility"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Submit Eligibility Request Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskRequestFailedResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "API key is missing or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access forbidden. The API key is valid but does not have permission to access this resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorizationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/wf/v2/workflows/submit-eligibility/{task-id}": {
+      "get": {
+        "tags": [
+          "Eligibility"
+        ],
+        "summary": "Eligibility Submission Request Status",
+        "description": "Fetch the current status of an Eligibility Submission Request. It takes the `taskId`, provided by the Eligibility Submission Request, as input.",
+        "operationId": "getSubmitEligibilityRequestStatus",
+        "parameters": [
+          {
+            "name": "task-id",
+            "in": "path",
+            "description": "Provide a task id to retreive the Eligibility Submission Request status",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status of an Eligibility Submission Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_eligibility"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "API key is missing or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access forbidden. The API key is valid but does not have permission to access this resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorizationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/wf/v2/workflows/process-x12-eligibility-transaction": {
+      "post": {
+        "tags": [
+          "Eligibility"
+        ],
+        "summary": "Process X12 Eligibility Transaction (Draft)",
+        "operationId": "processX12EligibilityTransactionRequest",
+        "description": "All the necessary information required to process a X12 Eligibility Transaction. On receipt, the API performs a quick validation (not verification) of the request for correctness. On successful validation returns a `taskId` which can be used for tracking this request. Also, the `task#queued` event is triggered.",
+        "requestBody": {
+          "description": "Process X12 Eligibility Transaction Request Body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessX12EligibilityTransactionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status of a Process X12 Eligibility Transaction Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskRequestSuccessResponse_ProcessX12EligibilityTransaction"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "API key is missing or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access forbidden. The API key is valid but does not have permission to access this resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorizationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/wf/v2/workflows/process-x12-eligibility-transaction/{task-id}": {
+      "get": {
+        "tags": [
+          "Eligibility"
+        ],
+        "summary": "Process X12 Eligibility Transaction Status (Draft)",
+        "operationId": "getProcessX12EligibilityTransactionRequestStatus",
+        "description": "Fetch the current status of an Process X12 Eligibility Transaction. It takes the `taskId`, provided by the Process X12 Eligibility Transaction, as input.",
+        "parameters": [
+          {
+            "name": "task-id",
+            "in": "path",
+            "description": "Provide a task id to retreive the Process X12 Eligibility Transaction status",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status of a Process X12 Eligibility Transaction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_process_x12_eligibility_transaction"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "API key is missing or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access forbidden. The API key is valid but does not have permission to access this resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorizationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "webhooks": {
+    "E5TaskEvents": {
+      "post": {
+        "tags": [
+          "Automation"
+        ],
+        "operationId": "E5TaskEvent",
+        "description": "Due to the long running nature of workflows, Element5 has a webhook interface which sends out events at important junctures when a request is processed. The events would be posted to the Webhook URL which would be configured as part of the onboarding process. **Assumption:** The URLs and their access credentials would have been already shared to Element5 as part of the onboarding process.",
+        "summary": "Task Events (Callbacks)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Element5WebhookRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Event delivered successfully"
+          },
+          "4XX": {
+            "description": "Unable to deliver the event"
+          },
+          "5XX": {
+            "description": "Unable to deliver the event"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProcessX12EligibilityTransactionRequest": {
+        "required": [
+          "taskPayload"
+        ],
+        "type": "object",
+        "properties": {
+          "taskPayload": {
+            "$ref": "#/components/schemas/ProcessX12EligibilityTransactionRequestPayload"
+          }
+        }
+      },
+      "ProcessX12EligibilityTransactionAttachment270": {
+        "type": "object",
+        "description": "X12 270 file.",
+        "required": [
+          "uri"
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "HTTPS object store URI or data URI for the eligibility request (270) file.",
+            "oneOf": [
+              {
+                "pattern": "^https:\/\/(blob|blob-[a-zA-z]*)\\.e5\\.ai\/file-object\/[a-zA-Z0-9-].*$",
+                "description": "Must be an HTTPS link from blob.e5.ai or blob-qa.e5.ai"
+              },
+              {
+                "pattern": "^data:application/edi-x12;base64,[a-zA-Z0-9+/]*={0,2}$",
+                "description": "Base64 encoded EDI Data URI X12"
+              },
+              {
+                "pattern": "^data:(application/gzip|application/x-gzip|application/edi-x12\\+gzip);base64,[a-zA-Z0-9+/]*={0,2}$",
+                "description": "Base64 encoded Gzipped EDI Data URI"
+              }
+            ]
+          },
+          "interchangeDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Date of submission. ISO 8601 date."
+          },
+          "interchangeTime": {
+            "type": "string",
+            "description": "Time of submission. ISO 8601 time."
+          },
+          "interchangeTimezone": {
+            "type": "string",
+            "description": "Timezone of submission time. Mandatory when interchangeDate is provided."
+          }
+        }
+      },
+      "ProcessX12EligibilityTransactionAttachment271": {
+        "type": "object",
+        "description": "X12 271 file",
+        "required": [
+          "uri"
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "HTTPS object store URI or data URI for the eligibility response (271) file.",
+            "oneOf": [
+              {
+                "pattern": "^https://(blob|blob-[a-zA-z]*)\\.e5\\.ai/file-object/[a-zA-Z0-9-].*$",
+                "description": "Must be an HTTPS link from blob.e5.ai or blob-qa.e5.ai"
+              },
+              {
+                "pattern": "^data:application/edi-x12;base64,[a-zA-Z0-9+/]*={0,2}$",
+                "description": "Base64 encoded EDI Data URI X12"
+              },
+              {
+                "pattern": "^data:(application/gzip|application/x-gzip|application/edi-x12\\+gzip);base64,[a-zA-Z0-9+/]*={0,2}$",
+                "description": "Base64 encoded Gzipped EDI Data URI"
+              }
+            ]
+          },
+          "interchangeDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Date of response. ISO 8601 date."
+          },
+          "interchangeTime": {
+            "type": "string",
+            "description": "Time of response. ISO 8601 time."
+          },
+          "interchangeTimezone": {
+            "type": "string",
+            "description": "Timezone of response time. Mandatory when interchangeDate is provided."
+          }
+        }
+      },
+      "ProcessX12EligibilityTransactionRequestPayload": {
+        "type": "object",
+        "required": [
+          "transactionFiles",
+          "meta"
+        ],
+        "properties": {
+          "transactionFiles": {
+            "type": "object",
+            "description": "X12 270 (request) and X12 271 (response) files.",
+            "properties": {
+              "requestFile": {
+                "$ref": "#/components/schemas/ProcessX12EligibilityTransactionAttachment270"
+              },
+              "responseFile": {
+                "$ref": "#/components/schemas/ProcessX12EligibilityTransactionAttachment271"
+              }
+            },
+            "required": [
+              "requestFile",
+              "responseFile"
+            ]
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "eligibilityRequestInitiationDate": {
+                "type": "string",
+                "format": "date",
+                "description": "The date, eligibility request was initiated by the source system",
+                "example": "1981-12-25"
+              },
+              "gatewayName": {
+                "type": "string",
+                "description": "Clearinghouse or payer used to check eligibility (for example Availity, Waystar, UHC).",
+                "example": "Inovalon"
+              },
+              "senderDetails": {
+                "type": "object",
+                "description": "Sender details.",
+                "required": [
+                  "partnerName",
+                  "organizationName",
+                  "agencyName",
+                  "branchName"
+                ],
+                "properties": {
+                  "partnerName": {
+                    "type": "string",
+                    "description": "Partner entity name.",
+                    "example": "Wellsky"
+                  },
+                  "organizationName": {
+                    "type": "string",
+                    "description": "Organization or corporation name of the entity requesting the service.",
+                    "example": "11111-Affinity"
+                  },
+                  "agencyName": {
+                    "type": "string",
+                    "description": "Agency or clinic name associated with the service.",
+                    "example": "Polk"
+                  },
+                  "branchName": {
+                    "type": "string",
+                    "description": "Branch name associated with the service.",
+                    "example": "Branch1"
+                  }
+                }
+              },
+              "patientDetails": {
+                "type": "object",
+                "description": "Patient details.",
+                "required": [
+                  "firstName",
+                  "lastName",
+                  "patientID",
+                  "dateOfBirth",
+                  "startOfCareDate"
+                ],
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "description": "Patient first name.",
+                    "minLength": 1,
+                    "maxLength": 50,
+                    "example": "John"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "description": "Patient last name.",
+                    "minLength": 1,
+                    "maxLength": 50,
+                    "example": "Smith"
+                  },
+                  "middleName": {
+                    "type": "string",
+                    "description": "Patient middle name.",
+                    "example": "Edward"
+                  },
+                  "patientID": {
+                    "type": "string",
+                    "description": "Patient unique identifier (for example medical record number).",
+                    "example": "BOX00003977"
+                  },
+                  "dateOfBirth": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Patient date of birth. ISO 8601 date.",
+                    "example": "1981-12-25"
+                  },
+                  "startOfCareDate": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Patient care episode or service start date. ISO 8601 date.",
+                    "example": "1981-12-25"
+                  }
+                }
+              },
+              "payerDetails": {
+                "type": "object",
+                "description": "Payer details. Exactly one of memberId, MBI, or medicaidID must be provided.",
+                "required": [
+                  "payerName",
+                  "payerPlanName",
+                  "payerType",
+                  "payerHierarchy"
+                ],
+                "properties": {
+                  "payerName": {
+                    "type": "string",
+                    "description": "Payer name.",
+                    "example": "UHC"
+                  },
+                  "payerPlanName": {
+                    "type": "string",
+                    "description": "Payer plan name of the patient as in the EHR.",
+                    "example": "AARP Medicare Advantage from UnitedHealthcare"
+                  },
+                  "payerType": {
+                    "type": "string",
+                    "description": "Payer type of the patient as in the EHR.",
+                    "example": "MA"
+                  },
+                  "payerHierarchy": {
+                    "type": "string",
+                    "description": "Whether the insurance is primary, secondary, or tertiary (P, S, or T).",
+                    "enum": [
+                      "P",
+                      "S",
+                      "T"
+                    ],
+                    "example": "P"
+                  }
+                },
+                "oneOf": [
+                  {
+                    "properties": {
+                      "memberId": {
+                        "type": "string",
+                        "description": "Member identification number or payer policy number.",
+                        "example": "W9837639"
+                      }
+                    },
+                    "required": [
+                      "memberId"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "MBI": {
+                        "type": "string",
+                        "description": "Medicare beneficiary identifier, for Medicare patients.",
+                        "example": "3FH9AA4K221"
+                      }
+                    },
+                    "required": [
+                      "MBI"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "medicaidID": {
+                        "type": "string",
+                        "description": "Medicaid identifier, if applicable.",
+                        "example": "500123456789"
+                      }
+                    },
+                    "required": [
+                      "medicaidID"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "senderDetails",
+              "patientDetails",
+              "payerDetails",
+              "gatewayName",
+              "eligibilityRequestInitiationDate"
+            ]
+          }
+        }
+      },
+      "AuthError": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "401"
+          },
+          "message": {
+            "type": "string",
+            "example": "API key is missing or invalid"
+          }
+        }
+      },
+      "AuthorizationError": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "403"
+          },
+          "message": {
+            "type": "string",
+            "example": "Access forbidden. The API key is valid but does not have permission to access this resource."
+          }
+        }
+      },
+      "DateString": {
+        "type": "string",
+        "description": "Date and time in ISO8601 format",
+        "format": "date-time",
+        "example": "2017-07-21T17:32:28Z"
+      },
+      "ShortDateString": {
+        "type": "string",
+        "description": "Date in ISO8601 format",
+        "format": "date",
+        "example": "2025-01-01"
+      },
+      "TaskPriority": {
+        "type": "string",
+        "example": "high",
+        "enum": [
+          "high",
+          "medium",
+          "low"
+        ]
+      },
+      "TaskName": {
+        "type": "string",
+        "enum": [
+          "submit-authorization",
+          "submit-eligibility"
+        ]
+      },
+      "TaskName_Authorization": {
+        "type": "string",
+        "title": "TaskName",
+        "enum": [
+          "submit-authorization"
+        ]
+      },
+      "TaskName_Eligibility": {
+        "type": "string",
+        "title": "TaskName",
+        "enum": [
+          "submit-eligibility"
+        ]
+      },
+      "TaskName_ProcessX12EligibilityTransaction": {
+        "type": "string",
+        "title": "TaskName",
+        "enum": [
+          "process-x12-eligibility-transaction"
+        ]
+      },
+      "TaskStatus_Queued": {
+        "type": "string",
+        "enum": [
+          "queued"
+        ]
+      },
+      "TaskStatus_Processing": {
+        "type": "string",
+        "enum": [
+          "processing"
+        ]
+      },
+      "TaskStatus_Failed": {
+        "type": "string",
+        "enum": [
+          "failed"
+        ]
+      },
+      "TaskStatus_Success": {
+        "type": "string",
+        "enum": [
+          "success"
+        ]
+      },
+      "TaskStatuses": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/TaskStatus_Queued"
+          },
+          {
+            "$ref": "#/components/schemas/TaskStatus_Processing"
+          },
+          {
+            "$ref": "#/components/schemas/TaskStatus_Failed"
+          },
+          {
+            "$ref": "#/components/schemas/TaskStatus_Success"
+          }
+        ]
+      },
+      "TaskID": {
+        "type": "string",
+        "format": "uuid",
+        "example": "55dfe5e9-725a-4ce0-ba41-925e588623c2"
+      },
+      "DocumentRefID": {
+        "type": "string",
+        "format": "uuid",
+        "example": "55dfe5e9-725a-4ce0-ba41-925e588623c2"
+      },
+      "TaskPrioritiesUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskPriorityUpdateRequest"
+            }
+          }
+        }
+      },
+      "TaskPrioritiesUpdateSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskPriorityUpdateResponse"
+            }
+          }
+        }
+      },
+      "TaskPrioritiesUpdateFailedResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Failed"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "TaskPriorityUpdateRequest": {
+        "required": [
+          "taskId",
+          "newTaskPriority"
+        ],
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "newTaskPriority": {
+            "$ref": "#/components/schemas/TaskPriority"
+          }
+        }
+      },
+      "TaskPriorityUpdateResponse": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "updatedPriority": {
+            "$ref": "#/components/schemas/TaskPriority"
+          }
+        }
+      },
+      "FileUploadSuccessResponse": {
+        "type": "object",
+        "description": "File upload Success Response",
+        "properties": {
+          "fileObjectId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "File object ID",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "downloadUrl": {
+            "type": "string",
+            "description": "Unique URL to access the uploaded file",
+            "example": "https://blob.e5.ai/store/v1/file-object/550e8400-e29b-41d4-a716-446655440000"
+          }
+        }
+      },
+      "FileUploadBadRequestError": {
+        "type": "object",
+        "description": "File upload Bad Request Error Response",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Error code",
+            "example": "400"
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message",
+            "example": "Bad request - the uploaded file is invalid or missing required data"
+          }
+        },
+        "example": {
+          "code": "400",
+          "message": "Bad request - the uploaded file is invalid or missing required data"
+        }
+      },
+      "FileUploadPayloadTooLargeError": {
+        "type": "object",
+        "description": "File upload Payload Too Large Error Response",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Error code",
+            "example": "413"
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message",
+            "example": "Payload too large - file exceeds maximum size"
+          }
+        },
+        "example": {
+          "code": "413",
+          "message": "Payload too large - file exceeds maximum size"
+        }
+      },
+      "SubmitAuthorizationRequest": {
+        "required": [
+          "taskPayload"
+        ],
+        "type": "object",
+        "properties": {
+          "taskPayload": {
+            "$ref": "#/components/schemas/SubmitAuthorizationRequestPayload"
+          }
+        }
+      },
+      "AuthorizationStatusSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Success"
+          }
+        },
+        "description": "Request has succeeded"
+      },
+      "TaskRequestSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Queued"
+          }
+        },
+        "description": "Task Request has succeeded"
+      },
+      "TaskRequestSuccessResponse_Authorization": {
+        "type": "object",
+        "title": "TaskRequestSuccessResponse",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_Authorization"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Queued"
+          }
+        },
+        "description": "Task Request has succeeded"
+      },
+      "TaskRequestSuccessResponse_Eligibility": {
+        "type": "object",
+        "title": "TaskRequestSuccessResponse",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_Eligibility"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Queued"
+          }
+        },
+        "description": "Task Request has succeeded"
+      },
+      "TaskRequestSuccessResponse_ProcessX12EligibilityTransaction": {
+        "type": "object",
+        "title": "TaskRequestSuccessResponse",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_ProcessX12EligibilityTransaction"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Queued"
+          }
+        },
+        "description": "Task Request has succeeded"
+      },
+      "TaskRequestFailedResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Failed"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "description": "Task Request has failed"
+      },
+      "TaskStatusResponse": {
+        "description": "Task Status",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/TaskQueued"
+          },
+          {
+            "$ref": "#/components/schemas/TaskStarted"
+          },
+          {
+            "$ref": "#/components/schemas/TaskRestarted"
+          },
+          {
+            "$ref": "#/components/schemas/TaskProgressed"
+          },
+          {
+            "$ref": "#/components/schemas/TaskSucceeded"
+          },
+          {
+            "$ref": "#/components/schemas/TaskFailed"
+          }
+        ]
+      },
+      "ListRecentTasksResponse": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskStatusResponse"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "nextPageCursor": {
+            "$ref": "#/components/schemas/TaskID"
+          }
+        },
+        "description": "List Recent Tasks"
+      },
+      "TaskQueued": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Queued"
+          }
+        }
+      },
+      "TaskStarted": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Processing"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "TaskRestarted": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Processing"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          }
+        }
+      },
+      "TaskSucceeded": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Success"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "endedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "taskPayload": {
+            "$ref": "#/components/schemas/TaskSuccesses"
+          }
+        }
+      },
+      "TaskFailed": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Failed"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "endedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "taskPayload": {
+            "$ref": "#/components/schemas/TaskFailures"
+          }
+        }
+      },
+      "TaskProgressed": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Processing"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "taskPayload": {
+            "$ref": "#/components/schemas/TaskProgresses"
+          }
+        }
+      },
+      "TaskProgressed_Authorization": {
+        "title": "TaskProgressed",
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_Authorization"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Processing"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "taskPayload": {
+            "$ref": "#/components/schemas/AuthorizationTaskProgresses"
+          }
+        }
+      },
+      "TaskProgressed_Eligibility": {
+        "title": "TaskProgressed",
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_Eligibility"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Processing"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "taskPayload": {
+            "$ref": "#/components/schemas/EligibilityTaskProgresses"
+          }
+        }
+      },
+      "TaskProgressed_EdiExchange": {
+        "title": "TaskProgressed",
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_ProcessX12EligibilityTransaction"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Processing"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "taskPayload": {
+            "type": "object",
+            "properties": {
+              "response": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "TaskQueued_Authorization": {
+        "type": "object",
+        "title": "TaskQueued",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_Authorization"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Queued"
+          }
+        }
+      },
+      "TaskQueued_Eligibility": {
+        "type": "object",
+        "title": "TaskQueued",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_Eligibility"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Queued"
+          }
+        }
+      },
+      "TaskQueued_EdiExchange": {
+        "type": "object",
+        "title": "TaskQueued",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_ProcessX12EligibilityTransaction"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Queued"
+          }
+        }
+      },
+      "TaskStarted_Authorization": {
+        "type": "object",
+        "title": "TaskStarted",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_Authorization"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Processing"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "TaskStarted_Eligibility": {
+        "type": "object",
+        "title": "TaskStarted",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_Eligibility"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Processing"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "TaskStarted_EdiExchange": {
+        "type": "object",
+        "title": "TaskStarted",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_ProcessX12EligibilityTransaction"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Processing"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "TaskRestarted_Authorization": {
+        "type": "object",
+        "title": "TaskRestarted",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_Authorization"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Processing"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          }
+        }
+      },
+      "TaskRestarted_Eligibility": {
+        "type": "object",
+        "title": "TaskRestarted",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_Eligibility"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Processing"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          }
+        }
+      },
+      "TaskRestarted_EdiExchange": {
+        "type": "object",
+        "title": "TaskRestarted",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_ProcessX12EligibilityTransaction"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Processing"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          }
+        }
+      },
+      "TaskSucceeded_Authorization": {
+        "type": "object",
+        "title": "TaskSucceeded",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_Authorization"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Success"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "endedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "taskPayload": {
+            "$ref": "#/components/schemas/AuthorizationTaskSuccesses"
+          }
+        }
+      },
+      "TaskSucceeded_Eligibility": {
+        "type": "object",
+        "title": "TaskSucceeded",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_Eligibility"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Success"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "endedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "taskPayload": {
+            "$ref": "#/components/schemas/EligibilityTaskSuccesses"
+          }
+        }
+      },
+      "TaskSucceeded_EdiExchange": {
+        "type": "object",
+        "title": "TaskSucceeded",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_ProcessX12EligibilityTransaction"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Success"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "endedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "taskPayload": {
+            "type": "object",
+            "properties": {
+              "response": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "TaskFailed_Authorization": {
+        "type": "object",
+        "title": "TaskFailed",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_Authorization"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Failed"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "endedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "taskPayload": {
+            "$ref": "#/components/schemas/AuthorizationTaskFailures"
+          }
+        }
+      },
+      "TaskFailed_Eligibility": {
+        "type": "object",
+        "title": "TaskFailed",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_Eligibility"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Failed"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "endedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "taskPayload": {
+            "$ref": "#/components/schemas/EligibilityTaskFailures"
+          }
+        }
+      },
+      "TaskFailed_EdiExchange": {
+        "type": "object",
+        "title": "TaskFailed",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/TaskID"
+          },
+          "taskName": {
+            "$ref": "#/components/schemas/TaskName_ProcessX12EligibilityTransaction"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus_Failed"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "endedAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "attempt": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "taskPayload": {
+            "type": "object",
+            "properties": {
+              "response": {
+                "type": "object",
+                "properties": {
+                  "failureReason": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Element5Events": {
+        "type": "string",
+        "enum": [
+          "task#queued",
+          "task#started",
+          "task#restarted",
+          "task#progressed",
+          "task#succeeded",
+          "task#failed"
+        ]
+      },
+      "Element5WebhookRequest": {
+        "type": "object",
+        "properties": {
+          "eventName": {
+            "$ref": "#/components/schemas/Element5Events"
+          },
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "eventPayload": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TaskEvents"
+              }
+            ]
+          }
+        }
+      },
+      "TaskEvents": {
+        "type": "object",
+        "properties": {
+          "task": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TaskQueued"
+              },
+              {
+                "$ref": "#/components/schemas/TaskStarted"
+              },
+              {
+                "$ref": "#/components/schemas/TaskRestarted"
+              },
+              {
+                "$ref": "#/components/schemas/TaskProgressed"
+              },
+              {
+                "$ref": "#/components/schemas/TaskSucceeded"
+              },
+              {
+                "$ref": "#/components/schemas/TaskFailed"
+              }
+            ]
+          }
+        }
+      },
+      "TaskSuccesses": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/AuthorizationTaskSuccesses"
+          },
+          {
+            "$ref": "#/components/schemas/EligibilityTaskSuccesses"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "taskName",
+          "mapping": {
+            "submit-authorization": "#/components/schemas/AuthorizationTaskSuccesses",
+            "submit-eligibility": "#/components/schemas/EligibilityTaskSuccesses"
+          }
+        }
+      },
+      "TaskProgresses": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/AuthorizationTaskProgresses"
+          },
+          {
+            "$ref": "#/components/schemas/EligibilityTaskProgresses"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "taskName",
+          "mapping": {
+            "submit-authorization": "#/components/schemas/AuthorizationTaskProgresses",
+            "submit-eligibility": "#/components/schemas/EligibilityTaskProgresses"
+          }
+        }
+      },
+      "AuthorizationTaskProgresses": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SubmitAuthorizationProgress"
+          }
+        ]
+      },
+      "EligibilityTaskProgresses": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SubmitEligibilityProgress"
+          }
+        ]
+      },
+      "AuthorizationTaskSuccesses": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SubmitAuthorizationSuccess"
+          }
+        ]
+      },
+      "SubmitAuthorizationSuccess": {
+        "type": "object",
+        "properties": {
+          "submitAuthorization": {
+            "$ref": "#/components/schemas/SubmitAuthorizationSuccessResponse"
+          }
+        }
+      },
+      "EligibilityTaskSuccesses": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SubmitEligibilitySuccessResponse"
+          }
+        ]
+      },
+      "TaskFailures": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/AuthorizationTaskFailures"
+          },
+          {
+            "$ref": "#/components/schemas/EligibilityTaskFailures"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "taskName",
+          "mapping": {
+            "submit-authorization": "#/components/schemas/AuthorizationTaskFailures",
+            "submit-eligibility": "#/components/schemas/EligibilityTaskFailures"
+          }
+        }
+      },
+      "AuthorizationTaskFailures": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SubmitAuthorizationFailure"
+          }
+        ]
+      },
+      "SubmitAuthorizationFailure": {
+        "type": "object",
+        "properties": {
+          "submitAuthorization": {
+            "$ref": "#/components/schemas/SubmitAuthorizationFailure_submitAuthorization"
+          }
+        }
+      },
+      "AuthorizationStatusChange": {
+        "required": [
+          "source",
+          "authRequestInfo"
+        ],
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "",
+            "example": "Navihealth",
+            "enum": [
+              "NaviHealth"
+            ]
+          },
+          "authRequestInfo": {
+            "$ref": "#/components/schemas/AuthRequestInfo"
+          }
+        }
+      },
+      "AuthRequestInfo": {
+        "required": [
+          "lookup",
+          "changedStatus"
+        ],
+        "type": "object",
+        "properties": {
+          "lookup": {
+            "$ref": "#/components/schemas/Lookup",
+            "description": ""
+          },
+          "authorizationResponse": {
+            "$ref": "#/components/schemas/ChangedStatus",
+            "description": ""
+          }
+        }
+      },
+      "Lookup": {
+        "required": [
+          "authorizationID",
+          "healthPlanID",
+          "patient",
+          "admitDate",
+          "memberID",
+          "service",
+          "requestDate",
+          "fromDate",
+          "toDate"
+        ],
+        "type": "object",
+        "properties": {
+          "authorizationID": {
+            "type": "string",
+            "description": "Payer Auth ID generated for a given auth request"
+          },
+          "healthPlanID": {
+            "type": "string",
+            "description": "Payer Plan Auth ID generated for a given auth request"
+          },
+          "patient": {
+            "$ref": "#/components/schemas/Patient",
+            "description": ""
+          },
+          "admitDate": {
+            "$ref": "#/components/schemas/ShortDateString",
+            "description": ""
+          },
+          "memberID": {
+            "type": "string",
+            "description": "Payer Member ID"
+          },
+          "service": {
+            "type": "string",
+            "description": "Services for which Auth request can be placed"
+          },
+          "requestDate": {
+            "$ref": "#/components/schemas/ShortDateString",
+            "description": "Date on which auth was requested in the payer portal"
+          },
+          "fromDate": {
+            "$ref": "#/components/schemas/ShortDateString",
+            "description": ""
+          },
+          "toDate": {
+            "$ref": "#/components/schemas/ShortDateString",
+            "description": ""
+          }
+        }
+      },
+      "Patient": {
+        "required": [
+          "firstName",
+          "lastName",
+          "dateofBirth"
+        ],
+        "type": "object",
+        "properties": {
+          "lastName": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string",
+            "description": "Last name of the patient"
+          },
+          "firstName": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string",
+            "description": "First name of the patient"
+          },
+          "dateofBirth": {
+            "$ref": "#/components/schemas/ShortDateString",
+            "description": "DOB of the patient"
+          }
+        }
+      },
+      "ChangedStatus": {
+        "required": [
+          "status",
+          "quantities"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Status of the auth request placed Status in which any particular referral is in",
+            "example": "Approved",
+            "enum": [
+              "Pending",
+              "Approved",
+              "Denied",
+              "Void"
+            ]
+          },
+          "quantities": {
+            "$ref": "#/components/schemas/ServiceQuantities"
+          }
+        }
+      },
+      "ServiceQuantities": {
+        "required": [
+          "requestedUnits",
+          "approvedUnits",
+          "deniedUnits"
+        ],
+        "type": "object",
+        "properties": {
+          "requestedUnits": {
+            "type": "integer",
+            "description": "Number of quantities requested"
+          },
+          "approvedUnits": {
+            "type": "integer",
+            "description": "Number of quantities approved"
+          },
+          "deniedUnits": {
+            "type": "integer",
+            "description": "Number of quantities denied"
+          }
+        }
+      },
+      "inline_response_200_authorization": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/TaskStarted_Authorization"
+          },
+          {
+            "$ref": "#/components/schemas/TaskQueued_Authorization"
+          },
+          {
+            "$ref": "#/components/schemas/TaskRestarted_Authorization"
+          },
+          {
+            "$ref": "#/components/schemas/TaskProgressed_Authorization"
+          },
+          {
+            "$ref": "#/components/schemas/TaskSucceeded_Authorization"
+          },
+          {
+            "$ref": "#/components/schemas/TaskFailed_Authorization"
+          }
+        ]
+      },
+      "inline_response_200_eligibility": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/TaskStarted_Eligibility"
+          },
+          {
+            "$ref": "#/components/schemas/TaskQueued_Eligibility"
+          },
+          {
+            "$ref": "#/components/schemas/TaskRestarted_Eligibility"
+          },
+          {
+            "$ref": "#/components/schemas/TaskProgressed_Eligibility"
+          },
+          {
+            "$ref": "#/components/schemas/TaskSucceeded_Eligibility"
+          },
+          {
+            "$ref": "#/components/schemas/TaskFailed_Eligibility"
+          }
+        ]
+      },
+      "inline_response_200_process_x12_eligibility_transaction": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/TaskStarted_EdiExchange"
+          },
+          {
+            "$ref": "#/components/schemas/TaskQueued_EdiExchange"
+          },
+          {
+            "$ref": "#/components/schemas/TaskRestarted_EdiExchange"
+          },
+          {
+            "$ref": "#/components/schemas/TaskProgressed_EdiExchange"
+          },
+          {
+            "$ref": "#/components/schemas/TaskSucceeded_EdiExchange"
+          },
+          {
+            "$ref": "#/components/schemas/TaskFailed_EdiExchange"
+          }
+        ]
+      },
+      "AuthorizationRequestAttachments": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL of a file which would be attached submitted as part of authorization request. "
+          },
+          "attachmentType": {
+            "type": "string",
+            "description": "Type of the attachment. Like Auth Attachments, Patient Information Sheet, Episode Summary Report, Medical Record Coordination Note Report, Patient Order Report, Visit Note Report, Wound Assessment Tool Report, SN Eval Note, Wound Report, and Scheduling/Calendar Report",
+            "example": "Conditional list of attachments based on Payer requirements and Client preference."
+          }
+        }
+      },
+      "SubmitAuthorizationFailure_submitAuthorization": {
+        "type": "object",
+        "properties": {
+          "failureReason": {
+            "type": "string"
+          }
+        }
+      },
+      "SubmitAuthorizationRequestPayload": {
+        "type": "object",
+        "properties": {
+          "senderDetails": {
+            "type": "object",
+            "properties": {
+              "partnerName": {
+                "type": "string",
+                "description": "Partner entity Name",
+                "example": "Wellsky"
+              },
+              "organizationName": {
+                "type": "string",
+                "description": "Organization/Corporation name of the entity requesting the service",
+                "example": "11111-Affinity"
+              },
+              "agencyName": {
+                "type": "string",
+                "description": "Agency/Clinic name associated to the service",
+                "example": "Polk"
+              },
+              "branchName": {
+                "type": "string",
+                "description": "Branch name associated to the service",
+                "example": "Branch1"
+              }
+            },
+            "required": [
+              "partnerName",
+              "organizationName",
+              "agencyName",
+              "branchName"
+            ]
+          },
+          "patientDetails": {
+            "type": "object",
+            "description": "Patient Details",
+            "properties": {
+              "patientId": {
+                "type": "string",
+                "description": "Patient Unique ID - Eg: Medical Record number",
+                "example": "BOX00003977"
+              },
+              "firstName": {
+                "type": "string",
+                "description": "Patient first name",
+                "maxLength": 50,
+                "minLength": 1,
+                "example": "John"
+              },
+              "lastName": {
+                "type": "string",
+                "description": "Patient last name",
+                "maxLength": 50,
+                "minLength": 1,
+                "example": "Smith"
+              },
+              "middleName": {
+                "type": "string",
+                "description": "Patient middle name",
+                "example": "Edward",
+                "maxLength": 50,
+                "minLength": 1
+              },
+              "dateOfBirth": {
+                "type": "string",
+                "format": "date",
+                "description": "Patient Date of Birth. Date in ISO8601 format (YYYY-MM-DD)",
+                "example": "1980-12-20"
+              },
+              "gender": {
+                "type": "string",
+                "description": "Patient Gender",
+                "enum": [
+                  "M",
+                  "F"
+                ],
+                "example": "M"
+              },
+              "startOfCareDate": {
+                "type": "string",
+                "format": "date",
+                "description": "Patient care episode/service start date. Date in ISO8601 format (YYYY-MM-DD)",
+                "example": "2025-12-20"
+              },
+              "patientAddress": {
+                "type": "object",
+                "description": "Patient Address",
+                "properties": {
+                  "addressLine1": {
+                    "type": "string",
+                    "description": "Patient Address 1",
+                    "example": "123 Broadway St"
+                  },
+                  "addressLine2": {
+                    "type": "string",
+                    "description": "Patient Address 2",
+                    "example": "Apt 2"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "Patient City",
+                    "example": "Dallas"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "Patient state code - Eg:TX for Texas",
+                    "example": "TX"
+                  },
+                  "zip": {
+                    "type": "string",
+                    "description": "Patient Zip (NNNNN or NNNNN-NNNN)",
+                    "pattern": "^\\d{5}(-\\d{4})?$",
+                    "example": "75001"
+                  }
+                },
+                "required": [
+                  "addressLine1",
+                  "city",
+                  "state",
+                  "zip"
+                ]
+              }
+            },
+            "required": [
+              "patientId",
+              "firstName",
+              "lastName",
+              "dateOfBirth",
+              "startOfCareDate",
+              "patientAddress"
+            ]
+          },
+          "episodeDetails": {
+            "type": "object",
+            "description": "Episode Details",
+            "properties": {
+              "episodeId": {
+                "type": "string",
+                "description": "Unique number to identify patient episode",
+                "example": "11111111"
+              },
+              "soeDate": {
+                "type": "string",
+                "format": "date",
+                "description": "Start of Episode. Date in ISO8601 format (YYYY-MM-DD)",
+                "example": "2025-12-20"
+              },
+              "eoeDate": {
+                "type": "string",
+                "format": "date",
+                "description": "End of Episode. Date in ISO8601 format (YYYY-MM-DD)",
+                "example": "2026-02-20"
+              }
+            },
+            "required": [
+              "soeDate",
+              "eoeDate",
+              "episodeId"
+            ]
+          },
+          "payerDetails": {
+            "type": "object",
+            "description": "Payer Details",
+            "properties": {
+              "payerName": {
+                "type": "string",
+                "description": "Payer Name",
+                "example": "UHC"
+              },
+              "payerPlanName": {
+                "type": "string",
+                "description": "Payer Plan name of the patient as in EHR",
+                "example": "AARP® Medicare Advantage from UnitedHealthcare"
+              },
+              "payerType": {
+                "type": "string",
+                "description": "Payer type of the patient as in EHR",
+                "example": "MA"
+              },
+              "payerId": {
+                "type": "string",
+                "description": "Payer ID of associated payer",
+                "example": "87726"
+              },
+              "payerHierarchy": {
+                "type": "string",
+                "description": "Indicates whether the insurance is Primary, Secondary, or Tertiary (P/S/T)",
+                "enum": [
+                  "Primary",
+                  "Secondary",
+                  "Tertiary"
+                ],
+                "example": "Primary"
+              },
+              "memberId": {
+                "type": "string",
+                "description": "Member identification number/payer policy number",
+                "example": "W9837639"
+              },
+              "MBI": {
+                "type": "string",
+                "description": "Medicare beneficiary ID, if Medicare patients",
+                "example": "3FH9AA4K221",
+                "pattern": "^[1-9][A-Z0-9]{2}[A-Z]{0,1}[A-Z0-9]{0,1}[0-9]{0,1}[A-Z0-9]{5}[A-Z0-9]{1}[A-Z0-9]{1}[A-Z0-9]{2}$"
+              },
+              "medicaidId": {
+                "type": "string",
+                "description": "Medicaid ID, if applicable",
+                "example": "500123456789"
+              },
+              "gatewayName": {
+                "type": "string",
+                "description": "Name of the gateway in which the request will be sent to",
+                "example": "Availity"
+              }
+            },
+            "required": [
+              "payerPlanName",
+              "memberId"
+            ]
+          },
+          "servicingProviderDetails": {
+            "type": "object",
+            "description": "Branch/Clinic details based on the records location",
+            "properties": {
+              "serviceLine": {
+                "type": "string",
+                "description": "Service line of which authorization is being requested for",
+                "example": "Home Health"
+              },
+              "branch": {
+                "type": "string",
+                "description": "Branch Name submitting the request",
+                "example": "Sunshine Healthcare"
+              },
+              "branchNPI": {
+                "type": "string",
+                "description": "Branch NPI submitting the request",
+                "pattern": "^\\d{10}$",
+                "example": "1427683941"
+              },
+              "branchAddress": {
+                "type": "object",
+                "description": "Branch Address",
+                "properties": {
+                  "addressLine1": {
+                    "type": "string",
+                    "description": "Branch Address 1",
+                    "example": "123 Main St"
+                  },
+                  "addressLine2": {
+                    "type": "string",
+                    "description": "Branch Address 2"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "Branch City",
+                    "example": "Dallas"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "Branch State code - Eg:TX for Texas",
+                    "example": "TX"
+                  },
+                  "zip": {
+                    "type": "string",
+                    "description": "Branch Zip (NNNNN or NNNNN-NNNN)",
+                    "pattern": "^\\d{5}(-\\d{4})?$",
+                    "example": "75001"
+                  }
+                }
+              }
+            },
+            "required": [
+              "branch",
+              "branchNPI"
+            ]
+          },
+          "orderingProviderDetails": {
+            "type": "object",
+            "description": "Ordering provider details",
+            "properties": {
+              "orderingProviderFirstName": {
+                "type": "string",
+                "description": "First name of the Physician who ordered this service",
+                "example": "John"
+              },
+              "orderingProviderLastName": {
+                "type": "string",
+                "description": "Last name of the Physician who ordered this service",
+                "example": "Smith"
+              },
+              "orderingProviderNPI": {
+                "type": "string",
+                "description": "NPI of the Physician ordering this service",
+                "pattern": "^\\d{10}$",
+                "example": "1223455250"
+              },
+              "orderingProviderAddress": {
+                "type": "object",
+                "description": "Address of the Physician ordering this service",
+                "properties": {
+                  "addressLine1": {
+                    "type": "string",
+                    "description": "Ordering provider Address 1",
+                    "example": "123 Main St"
+                  },
+                  "addressLine2": {
+                    "type": "string",
+                    "description": "Ordering provider Address 2"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "Ordering provider City",
+                    "example": "Dallas"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "Ordering provider State code - Eg:TX for Texas",
+                    "example": "TX"
+                  },
+                  "zip": {
+                    "type": "string",
+                    "description": "Ordering provider Zip (NNNNN or NNNNN-NNNN)",
+                    "pattern": "^\\d{5}(-\\d{4})?$",
+                    "example": "75001"
+                  }
+                }
+              }
+            },
+            "required": [
+              "orderingProviderNPI",
+              "orderingProviderFirstName",
+              "orderingProviderLastName"
+            ]
+          },
+          "referralInformation": {
+            "type": "object",
+            "description": "Patients Referral information",
+            "properties": {
+              "referralSource": {
+                "type": "string",
+                "description": "Referring source (Hospital/Physician/SNF)",
+                "enum": [
+                  "HOSPITAL",
+                  "PHYSICIAN",
+                  "SNF"
+                ],
+                "example": "PHYSICIAN"
+              },
+              "referringSourceName": {
+                "type": "string",
+                "description": "Facility or Physician who placed the referral",
+                "example": "Michael Scott"
+              },
+              "facilityDischargeDate": {
+                "type": "string",
+                "format": "date",
+                "description": "Date in which the patient was discharged from a facility; applicable when referring source is a facility; Mandatory when referral source is facility. Date in ISO8601 format (YYYY-MM-DD)",
+                "example": "2025-12-20"
+              }
+            },
+            "required": [
+              "referralSource",
+              "referringSourceName",
+              "facilityDischargeDate"
+            ]
+          },
+          "authorizationRequest": {
+            "type": "object",
+            "description": "Authorization Request Details",
+            "properties": {
+              "authType": {
+                "type": "string",
+                "description": "Auth type - Initial, Recert, Additional",
+                "enum": [
+                  "Initial",
+                  "Recert",
+                  "Additional"
+                ],
+                "example": "Initial"
+              },
+              "authRequestDetails": {
+                "type": "array",
+                "description": "Discipline level request details",
+                "items": {
+                  "properties": {
+                    "serviceDiscipline": {
+                      "type": "string",
+                      "description": "Discipline requiring request",
+                      "enum": [
+                        "SN",
+                        "PT",
+                        "OT",
+                        "MSW",
+                        "HHA",
+                        "ST",
+                        "LPN"
+                      ],
+                      "example": "SN"
+                    },
+                    "procedureCodes": {
+                      "type": "string",
+                      "description": "Procedure Codes per discipline based on portal",
+                      "example": "G0299, G0151, S9123, T1030"
+                    },
+                    "requestedQty": {
+                      "type": "integer",
+                      "description": "Total quantity (visits) to be requested for the given service discipline",
+                      "minimum": 1,
+                      "example": 10
+                    },
+                    "requestedStartDate": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "Start Date for discipline for which auth is requested; SOE will be used as priority based on payer/plan/auth type. Date in ISO8601 format (YYYY-MM-DD)",
+                      "example": "2025-12-20"
+                    },
+                    "requestedEndDate": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "End Date for discipline for which auth is requested; EOE will be used as priority based on payer/plan/auth type. Date in ISO8601 format (YYYY-MM-DD)",
+                      "example": "2025-12-27"
+                    }
+                  },
+                  "required": [
+                    "serviceDiscipline",
+                    "requestedQty",
+                    "requestedStartDate",
+                    "requestedEndDate"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "authType",
+              "authRequestDetails"
+            ]
+          },
+          "diagnosisDetails": {
+            "type": "array",
+            "description": "Diagnosis Details",
+            "items": {
+              "type": "object",
+              "properties": {
+                "diagnosisCode": {
+                  "type": "string",
+                  "description": "Diagnosis code submitted as part of Auth (ICD codes)",
+                  "example": "J44.9"
+                },
+                "sortOrder": {
+                  "type": "integer",
+                  "description": "Diagnosis code order",
+                  "minimum": 1,
+                  "example": 1
+                }
+              },
+              "minItems": 1,
+              "maxItems": 4,
+              "required": [
+                "diagnosisCode",
+                "sortOrder"
+              ]
+            }
+          },
+          "attachments": {
+            "type": "array",
+            "description": "List of attachments",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri",
+                  "description": "URL of a file which would be attached submitted as part of authorization request. Need creds for accessing SFTP (userID/pwd or token). Whitelisting will also be needed."
+                },
+                "attachmentType": {
+                  "type": "string",
+                  "description": "Type of the attachment"
+                },
+                "attachmentName": {
+                  "type": "string",
+                  "description": "Name of the attachment"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "patientDetails",
+          "episodeDetails",
+          "payerDetails",
+          "servicingProviderDetails",
+          "orderingProviderDetails",
+          "referralInformation",
+          "authorizationRequest",
+          "diagnosisDetails",
+          "senderDetails"
+        ]
+      },
+      "SubmitAuthorizationSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "authResponse": {
+            "$ref": "#/components/schemas/AuthResponse"
+          }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "patientDetails": {
+            "type": "object",
+            "description": "Patient Details",
+            "properties": {
+              "firstName": {
+                "type": "string",
+                "description": "Patient first name",
+                "maxLength": 50,
+                "minLength": 1,
+                "example": "John"
+              },
+              "lastName": {
+                "type": "string",
+                "description": "Patient last name",
+                "maxLength": 50,
+                "minLength": 1,
+                "example": "Smith"
+              },
+              "middleName": {
+                "type": "string",
+                "description": "Patient middle name",
+                "example": "Edward"
+              },
+              "patientId": {
+                "type": "string",
+                "description": "Patient Unique ID - Eg: Medical Record number",
+                "example": "BOX00003977"
+              }
+            },
+            "required": [
+              "firstName",
+              "lastName",
+              "patientId"
+            ]
+          },
+          "payerDetails": {
+            "type": "object",
+            "description": "Payer Details",
+            "properties": {
+              "memberId": {
+                "type": "string",
+                "description": "Member identification number/payer policy number",
+                "example": "W9837639"
+              },
+              "payerPlanName": {
+                "type": "string",
+                "description": "Payer Plan name of the patient",
+                "example": "AARP® Medicare Advantage from UnitedHealthcare"
+              },
+              "gateway": {
+                "type": "string",
+                "description": "Gateway in which the authorization was submitted",
+                "example": "UHC"
+              }
+            },
+            "required": [
+              "memberId",
+              "payerPlanName",
+              "gateway"
+            ]
+          },
+          "authorizationResponse": {
+            "description": "Authorization Response Details",
+            "type": "object",
+            "properties": {
+              "authNumber": {
+                "type": "string",
+                "description": "Authorization number returned from the payer after the request is placed"
+              },
+              "authStatus": {
+                "type": "string",
+                "description": "Status of the overall authorization request",
+                "enum": [
+                  "PENDING",
+                  "APPROVED",
+                  "DENIED",
+                  "PARTIALLY APPROVED",
+                  "EXCEPTION"
+                ],
+                "example": "PENDING"
+              },
+              "lastStatusCheck": {
+                "type": "string",
+                "format": "date",
+                "description": "Timestamp of the last attempt to submit or check the authorization in the portal. Date in ISO8601 format (YYYY-MM-DD)",
+                "example": "2025-05-26"
+              },
+              "payerResponseDate": {
+                "type": "string",
+                "format": "date",
+                "description": "Date in which the payer gave a response of the request that is no longer pending. Date in ISO8601 format (YYYY-MM-DD)",
+                "example": "2025-07-30"
+              },
+              "services": {
+                "type": "array",
+                "description": "Discipline level Auth response details",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "serviceDiscipline": {
+                      "type": "string",
+                      "description": "Discipline requested",
+                      "enum": [
+                        "SN",
+                        "PT",
+                        "OT",
+                        "MSW",
+                        "HHA",
+                        "ST",
+                        "LPN"
+                      ],
+                      "example": "SN"
+                    },
+                    "disciplineAuthStatus": {
+                      "type": "string",
+                      "description": "Auth status of the unique requested discipline",
+                      "enum": [
+                        "PENDING",
+                        "APPROVED",
+                        "DENIED",
+                        "PARTIALLY APPROVED",
+                        "EXCEPTION"
+                      ],
+                      "example": "PENDING"
+                    },
+                    "disciplineAuthNumber": {
+                      "type": "string",
+                      "description": "Authorization Number associated with the unique discipline for the authorization request",
+                      "example": "A2344222333"
+                    },
+                    "requestedUnits": {
+                      "type": "integer",
+                      "description": "Total qty requested for the unique discipline",
+                      "example": 10
+                    },
+                    "approvedUnits": {
+                      "type": "integer",
+                      "description": "Total visits approved for the unique discipline",
+                      "example": 5
+                    },
+                    "deniedUnits": {
+                      "type": "integer",
+                      "description": "Total visits denied for the unique discipline",
+                      "example": 3
+                    },
+                    "pendingUnits": {
+                      "type": "integer",
+                      "description": "Total visits pending for the unique discipline",
+                      "example": 2
+                    },
+                    "authStartDate": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "Authorization start date for the discipline - requested start date/approved start date. Date in ISO8601 format (YYYY-MM-DD)",
+                      "example": "2025-05-26"
+                    },
+                    "authEndDate": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "Authorization end date for the discipline - requested end date/approved end date. Date in ISO8601 format (YYYY-MM-DD)",
+                      "example": "2025-07-30"
+                    },
+                    "denialReason": {
+                      "type": "string",
+                      "description": "Reason provided for denial, if applicable"
+                    }
+                  }
+                }
+              },
+              "authResponseDocs": {
+                "type": "array",
+                "description": "Documents which are received as part of the Authorization Response",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "URL of a file which would be attached submitted as part of authorization request. Need creds for accessing SFTP (userID/pwd or token). Whitelisting will also be needed."
+                    },
+                    "attachmentType": {
+                      "type": "string",
+                      "description": "Type of the attachment"
+                    },
+                    "attachmentName": {
+                      "type": "string",
+                      "description": "Name of the attachment"
+                    }
+                  }
+                }
+              },
+              "authExceptions": {
+                "type": "string",
+                "description": "Exceptions encountered during auth submission or retrieval process"
+              }
+            },
+            "required": [
+              "authStatus"
+            ]
+          }
+        },
+        "required": [
+          "patientDetails",
+          "payerDetails",
+          "authorizationResponse"
+        ]
+      },
+      "EligibilityTaskFailures": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SubmitEligibilityFailure"
+          }
+        ]
+      },
+      "SubmitEligibilityRequest": {
+        "required": [
+          "taskPayload"
+        ],
+        "type": "object",
+        "properties": {
+          "taskPayload": {
+            "$ref": "#/components/schemas/SubmitEligibilityRequestPayload"
+          }
+        }
+      },
+      "SubmitEligibilityRequestPayload": {
+        "type": "object",
+        "properties": {
+          "senderDetails": {
+            "type": "object",
+            "properties": {
+              "partnerName": {
+                "type": "string",
+                "description": "Partner entity Name",
+                "example": "Wellsky"
+              },
+              "organizationName": {
+                "type": "string",
+                "description": "Organization/Corporation name of the entity requesting the service",
+                "example": "11111-Affinity"
+              },
+              "agencyName": {
+                "type": "string",
+                "description": "Agency/Clinic name associated to the service",
+                "example": "Polk"
+              },
+              "branchName": {
+                "type": "string",
+                "description": "Branch name associated to the service",
+                "example": "Branch1"
+              }
+            },
+            "required": [
+              "partnerName",
+              "organizationName",
+              "agencyName",
+              "branchName"
+            ]
+          },
+          "patientDetails": {
+            "type": "object",
+            "properties": {
+              "firstName": {
+                "type": "string",
+                "description": "Patient's first name as recorded in EHR",
+                "maxLength": 50,
+                "minLength": 1
+              },
+              "lastName": {
+                "type": "string",
+                "description": "Patient's last name as recorded in EHR",
+                "maxLength": 50,
+                "minLength": 1
+              },
+              "middleName": {
+                "type": "string",
+                "description": "Patient's middle name as recorded in EHR",
+                "maxLength": 50,
+                "minLength": 1
+              },
+              "patientId": {
+                "type": "string",
+                "description": "Medical Record Number assigned to the patient in the EHR."
+              },
+              "dateOfBirth": {
+                "type": "string",
+                "format": "date",
+                "description": "Date of birth of the patient as per EHR. Date in ISO8601 format",
+                "example": "1945-01-15"
+              },
+              "gender": {
+                "type": "string",
+                "description": "Gender of the patient as per EHR",
+                "enum": [
+                  "M",
+                  "F"
+                ]
+              },
+              "startOfCareDate": {
+                "type": "string",
+                "description": "The date the care episode or service started for the patient. Date in ISO8601 format",
+                "format": "date",
+                "example": "2024-06-15"
+              },
+              "patientAddress": {
+                "type": "object",
+                "description": "Patient's address as recorded in EHR",
+                "properties": {
+                  "addressLine1": {
+                    "type": "string",
+                    "description": "Patient's address line 1"
+                  },
+                  "addressLine2": {
+                    "type": "string",
+                    "description": "Patient's address line 2"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "Patient's city"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "Patient's state"
+                  },
+                  "zip": {
+                    "type": "string",
+                    "description": "Patient's zip"
+                  }
+                }
+              }
+            },
+            "required": [
+              "firstName",
+              "lastName",
+              "dateOfBirth",
+              "patientId",
+              "gender"
+            ]
+          },
+          "payerDetails": {
+            "type": "object",
+            "properties": {
+              "payerName": {
+                "type": "string",
+                "description": "Payer name"
+              },
+              "payerPlanName": {
+                "type": "string",
+                "description": "Payer Plan name of the patient as in EHR"
+              },
+              "payerType": {
+                "type": "string",
+                "description": "Payer type of the patient as in EHR"
+              },
+              "payerId": {
+                "type": "string",
+                "description": "Payor ID to submit the request to clearinghouse/Payer."
+              },
+              "payerHierarchy": {
+                "type": "string",
+                "description": "Indicates whether the insurance is Primary, Secondary, or Tertiary. (P/S/T)",
+                "enum": [
+                  "P",
+                  "S",
+                  "T"
+                ]
+              },
+              "memberId": {
+                "type": "string",
+                "description": "Member identification number provided by the payer and stored in the EHR"
+              },
+              "MBI": {
+                "type": "string",
+                "description": "Medicare beneficiary ID, if Medicare Patient"
+              },
+              "medicaidID": {
+                "type": "string",
+                "description": "Medicaid ID, if applicable"
+              }
+            },
+            "required": [
+              "payerPlanName",
+              "payerName",
+              "payerType",
+              "memberId"
+            ]
+          },
+          "gateway": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WaystarGateway"
+              },
+              {
+                "$ref": "#/components/schemas/UHCGateway"
+              },
+              {
+                "$ref": "#/components/schemas/AvailityGateway"
+              }
+            ],
+            "discriminator": {
+              "propertyName": "gatewayName",
+              "mapping": {
+                "Waystar": "#/components/schemas/WaystarGateway",
+                "UHC": "#/components/schemas/UHCGateway",
+                "Availity": "#/components/schemas/AvailityGateway"
+              }
+            }
+          },
+          "servicingProviderDetails": {
+            "type": "object",
+            "properties": {
+              "branch": {
+                "type": "string",
+                "description": "Branch Name submitting the request"
+              },
+              "branchNPI": {
+                "type": "string",
+                "description": "Branch NPI submitting the request"
+              },
+              "branchAddress": {
+                "type": "object",
+                "description": "Branch's address as recorded in EHR",
+                "properties": {
+                  "addressLine1": {
+                    "type": "string",
+                    "description": "Branch's address line 1"
+                  },
+                  "addressLine2": {
+                    "type": "string",
+                    "description": "Branch's address line 2"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "Branch's city"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "Branch's state"
+                  },
+                  "zip": {
+                    "type": "string",
+                    "description": "Branch's zip"
+                  }
+                }
+              }
+            },
+            "required": [
+              "branch",
+              "branchNPI"
+            ]
+          },
+          "serviceTypeCodes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "30",
+                "42",
+                "45"
+              ]
+            },
+            "description": "Service type codes to check eligibility. Use 270 codeset for service codes: 30 - General, 42 - Home Health, 45 - Hospice"
+          }
+        },
+        "required": [
+          "patientDetails",
+          "payerDetails",
+          "servicingProviderDetails",
+          "serviceTypeCodes",
+          "senderDetails"
+        ]
+      },
+      "SubmitEligibilitySuccessResponse": {
+        "type": "object",
+        "properties": {
+          "eligibilityResponse": {
+            "$ref": "#/components/schemas/EligibilityResponse"
+          },
+          "eligibilityResponseDocs": {
+            "type": "array",
+            "description": "Documents which are received as part of the Eligibility Response",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri",
+                  "description": "URL pointing to a file in Element5's object store. "
+                },
+                "documentType": {
+                  "type": "string",
+                  "description": "Type of the docuement. Like PDF of eligibility info from payer, PDF of member ID card if available from payer, etc. ",
+                  "example": "Eligibility PDF"
+                }
+              }
+            }
+          }
+        }
+      },
+      "EligibilityResponse": {
+        "type": "object",
+        "properties": {
+          "patientDetails": {
+            "type": "object",
+            "description": "Patient details from the payer's eligibility record",
+            "properties": {
+              "patientId": {
+                "type": "string",
+                "description": "Patient Unique ID - Eg: Medical Record number"
+              },
+              "firstName": {
+                "type": "string",
+                "description": "Patient's first name"
+              },
+              "lastName": {
+                "type": "string",
+                "description": "Patient's last name"
+              },
+              "middleName": {
+                "type": "string",
+                "description": "Patient's middle name"
+              },
+              "dateOfBirth": {
+                "type": "string",
+                "format": "date",
+                "description": "Patient's date of birth. Date in ISO8601 format"
+              },
+              "gender": {
+                "type": "string",
+                "description": "Gender of the patient from the payer's eligibility record"
+              },
+              "patientAddress": {
+                "type": "object",
+                "description": "Patient's address",
+                "properties": {
+                  "addressLine1": {
+                    "type": "string",
+                    "description": "Patient's address line 1"
+                  },
+                  "addressLine2": {
+                    "type": "string",
+                    "description": "Patient's address line 2"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "Patient's city"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "Patient's state"
+                  },
+                  "zip": {
+                    "type": "string",
+                    "description": "Patient's zip"
+                  }
+                }
+              },
+              "relationshipToSubscriber": {
+                "type": "string",
+                "description": "Patient Relationship to Subscriber"
+              }
+            },
+            "required": [
+              "patientId",
+              "firstName",
+              "lastName"
+            ]
+          },
+          "subscriberDetails": {
+            "type": "object",
+            "description": "Subscriber details from the payer's eligibility record",
+            "properties": {
+              "firstName": {
+                "type": "string",
+                "description": "Subscriber's first name"
+              },
+              "lastName": {
+                "type": "string",
+                "description": "Subscriber's last name"
+              },
+              "middleName": {
+                "type": "string",
+                "description": "Subscriber's middle name"
+              },
+              "dateOfBirth": {
+                "type": "string",
+                "format": "date",
+                "description": "Subscriber's date of birth. Date in ISO8601 format"
+              },
+              "gender": {
+                "type": "string",
+                "description": "Gender of the Subscriber from the payer's eligibility record"
+              },
+              "subscriberAddress": {
+                "type": "object",
+                "description": "Subscriber's address",
+                "properties": {
+                  "addressLine1": {
+                    "type": "string",
+                    "description": "Subscriber's address line 1"
+                  },
+                  "addressLine2": {
+                    "type": "string",
+                    "description": "Subscriber's address line 2"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "Subscriber's city"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "Subscriber's state"
+                  },
+                  "zip": {
+                    "type": "string",
+                    "description": "Subscriber's zip"
+                  }
+                }
+              }
+            },
+            "required": []
+          },
+          "payerDetails": {
+            "type": "object",
+            "description": "Payer details from the payer's eligibility record",
+            "properties": {
+              "payerName": {
+                "type": "string",
+                "description": "Name of the Payer"
+              },
+              "planName": {
+                "type": "string",
+                "description": "Name of the insurance plan"
+              },
+              "payerType": {
+                "type": "string",
+                "description": "Type of payer (e.g., Medicare, Medicaid, Medicare Advantage)"
+              },
+              "payerId": {
+                "type": "string",
+                "description": "Electronic 5-digit ID used for payer transactions"
+              },
+              "memberId": {
+                "type": "string",
+                "description": "Member identification number returned from the payer"
+              },
+              "MBI": {
+                "type": "string",
+                "description": "Medicare Beneficiary Identifier assigned by CMS"
+              },
+              "medicaidID": {
+                "type": "string",
+                "description": "Medicaid ID, if applicable"
+              },
+              "gateway": {
+                "type": "string",
+                "description": "Clearinghouse/Payor where eligibility was checked (e.g., Availity, Waystar. UHC)."
+              }
+            },
+            "required": [
+              "gateway"
+            ]
+          },
+          "planDetails": {
+            "type": "object",
+            "description": "Plan details from the payer's eligibility record",
+            "properties": {
+              "planNumber": {
+                "type": "string",
+                "description": "Unique identifier assigned to the member's insurance plan"
+              },
+              "planSponsor": {
+                "type": "string",
+                "description": "Organization or employer that offers or funds the health insurance plan."
+              },
+              "groupName": {
+                "type": "string",
+                "description": "Name of the employer or group associated with the insurance coverage."
+              },
+              "groupNumber": {
+                "type": "string",
+                "description": "Identifier used to group members under the same employer or plan contract."
+              },
+              "planType": {
+                "type": "string",
+                "description": "Type of health plan (e.g., HMO, PPO)",
+                "example": "HMO"
+              },
+              "planAuthorizationRequired": {
+                "type": "string",
+                "description": "Indicates whether prior authorization is required for services under the plan."
+              },
+              "utilizationManagementOrganization": {
+                "type": "string",
+                "description": "Utilization Management Organization info"
+              },
+              "CMSContractNumber": {
+                "type": "string",
+                "description": "CMS-issued contract number for the Medicare plan"
+              }
+            },
+            "required": []
+          },
+          "planCoverage": {
+            "type": "object",
+            "description": "Plan coverage details from the payer's eligibility record",
+            "properties": {
+              "eligibilityCheckDate": {
+                "type": "string",
+                "format": "date",
+                "description": "Eligibility check date",
+                "example": "1945-01-15"
+              },
+              "EligibilityInquiryId": {
+                "type": "string",
+                "description": "Reference number for the eligibility inquiry from CH/Payer"
+              },
+              "coverageStatus": {
+                "type": "string",
+                "description": "Indicates whether the policy is active or inactive"
+              },
+              "coverageDescription": {
+                "type": "string",
+                "description": "Coverage description from the payer"
+              },
+              "policyStartDate": {
+                "type": "string",
+                "description": "Policy Start Date. Date in ISO8601 format",
+                "format": "date",
+                "example": "1945-01-15"
+              },
+              "policyEndDate": {
+                "type": "string",
+                "description": "Policy End Date. Date in ISO8601 format",
+                "format": "date",
+                "example": "1945-01-15"
+              },
+              "referralStatus": {
+                "type": "string",
+                "description": "Indicates if referrals are required under the plan"
+              },
+              "serviceCareProviderNetworkStatus": {
+                "type": "string",
+                "description": "Service Care Provider Network Status",
+                "example": [
+                  "In-Network",
+                  "Out-of-Network"
+                ]
+              }
+            },
+            "required": [
+              "eligibilityCheckDate"
+            ]
+          },
+          "planBenefits": {
+            "type": "array",
+            "description": "Plan benefits and plan level accumulator info",
+            "items": {
+              "type": "object",
+              "properties": {
+                "network": {
+                  "type": "string",
+                  "enum": [
+                    "In-Network",
+                    "Out-of-Network",
+                    "General"
+                  ]
+                },
+                "coverageLevel": {
+                  "type": "string",
+                  "description": "Coverage level of the benefits. Eg: 'Individual', 'Family', 'Employee Only'",
+                  "example": [
+                    "Individual",
+                    "Family",
+                    "Employee Only"
+                  ]
+                },
+                "benefitStartDate": {
+                  "type": "string",
+                  "description": "Benefit Start Date. Date in ISO8601 format",
+                  "format": "date",
+                  "example": "1945-01-15"
+                },
+                "benefitEndDate": {
+                  "type": "string",
+                  "description": "Benefit End Date. Date in ISO8601 format",
+                  "format": "date",
+                  "example": "1945-01-15"
+                },
+                "deductible": {
+                  "type": "array",
+                  "description": "Deductible details",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "deductibleAmount": {
+                        "type": "string",
+                        "description": "Total deductible amount"
+                      },
+                      "deductibleUsed": {
+                        "type": "string",
+                        "description": "Used deductible amount"
+                      },
+                      "deductibleRemaining": {
+                        "type": "string",
+                        "description": "Remaining deductible amount"
+                      },
+                      "deductiblePayerNotes": {
+                        "type": "string",
+                        "description": "Deductible payer notes"
+                      }
+                    }
+                  }
+                },
+                "outOfPocket": {
+                  "type": "array",
+                  "description": "Out Of Pocket Maximum Details",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "outOfPocketMaximum": {
+                        "type": "string",
+                        "description": "Out of pocket maxiumum amount"
+                      },
+                      "outOfPocketUsed": {
+                        "type": "string",
+                        "description": "Out of pocket amount used"
+                      },
+                      "outOfPocketRemaining": {
+                        "type": "string",
+                        "description": "Out of pocket amount remaining"
+                      },
+                      "outOfPocketPayerNotes": {
+                        "type": "string",
+                        "description": "Out of pocket Payer notes"
+                      }
+                    }
+                  }
+                }
+              },
+              "required": []
+            }
+          },
+          "serviceLevelDetails": {
+            "type": "array",
+            "description": "Service level details from the payer's eligibility record",
+            "items": {
+              "type": "object",
+              "properties": {
+                "serviceTypeCode": {
+                  "type": "string",
+                  "description": "Code representing the type of service (e.g., 42 for Home Health)"
+                },
+                "serviceTypeDescription": {
+                  "type": "string",
+                  "description": "Description of the service associated with the code"
+                },
+                "coverageStatus": {
+                  "type": "string",
+                  "description": "Coverage status for the service type"
+                },
+                "coverageDescription": {
+                  "type": "string",
+                  "description": "Coverage description from the payer"
+                },
+                "benefitStartDate": {
+                  "type": "string",
+                  "description": "Benefit Start Date. Date in ISO8601 format",
+                  "format": "date",
+                  "example": "1945-01-15"
+                },
+                "benefitEndDate": {
+                  "type": "string",
+                  "description": "Benefit End Date. Date in ISO8601 format",
+                  "format": "date",
+                  "example": "1945-01-15"
+                },
+                "serviceLevelBenefits": {
+                  "type": "array",
+                  "description": "Plan benefits and plan level accumulator info",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "network": {
+                        "type": "string",
+                        "enum": [
+                          "In-Network",
+                          "Out-of-Network",
+                          "General"
+                        ]
+                      },
+                      "coverageLevel": {
+                        "type": "string",
+                        "description": "Coverage level of the benefits. Eg: 'Individual', 'Family', 'Employee Only'",
+                        "example": [
+                          "Individual",
+                          "Family",
+                          "Employee Only"
+                        ]
+                      },
+                      "coPayment": {
+                        "type": "array",
+                        "description": "Co-payment details for the service type.",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "coPayAmount": {
+                              "type": "string",
+                              "description": "Co-Pay amount"
+                            },
+                            "coPayPayerNotes": {
+                              "type": "string",
+                              "description": "Co-Pay Payer Notes"
+                            },
+                            "authRequired": {
+                              "type": "string",
+                              "description": "Indicates if authorization is needed for the specified benefit."
+                            }
+                          }
+                        }
+                      },
+                      "coInsurance": {
+                        "type": "array",
+                        "description": "Co-Insurance details for the service type.",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "coInsurancepercent": {
+                              "type": "string",
+                              "description": "Co-Insurance % for  service type."
+                            },
+                            "coInsurancePayerNotes": {
+                              "type": "string",
+                              "description": "Co-Insurance Payer Notes"
+                            },
+                            "authRequired": {
+                              "type": "string",
+                              "description": "Indicates if authorization is needed for the specified benefit."
+                            }
+                          }
+                        }
+                      },
+                      "deductible": {
+                        "type": "array",
+                        "description": "Deductible requirements for service type.",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "deductibleAmount": {
+                              "type": "string",
+                              "description": "Total deductible amount"
+                            },
+                            "deductibleUsed": {
+                              "type": "string",
+                              "description": "Used deductible amount"
+                            },
+                            "deductibleRemaining": {
+                              "type": "string",
+                              "description": "Remaining deductible amount"
+                            },
+                            "deductiblePayerNotes": {
+                              "type": "string",
+                              "description": "Deductible payer notes"
+                            }
+                          }
+                        }
+                      },
+                      "visitLimitsAndDisciplineExclusionsDetails": {
+                        "type": "array",
+                        "description": "Visit Limits And Discipline Exclusions details for the service type.",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "visitLimitsAndDisciplineExclusions": {
+                              "type": "string",
+                              "description": "Limits and exclusions for the service type."
+                            },
+                            "visitLimitsAndExclusionsPayerNotes": {
+                              "type": "string",
+                              "description": "Visit limits and Exclusions Payer Notes"
+                            },
+                            "authRequired": {
+                              "type": "string",
+                              "description": "Indicates if authorization is needed for the specified benefit."
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "memberIdCard": {
+            "type": "object",
+            "description": "Member ID card details from the payer's eligibility record",
+            "properties": {
+              "payerId": {
+                "type": "string",
+                "description": "5-digit payer ID from the insurance ID card"
+              },
+              "providerPhoneNumber": {
+                "type": "string",
+                "description": "Customer or provider service number listed on the card"
+              },
+              "medicareNationalNetworkStatus": {
+                "type": "string",
+                "description": "Network status specific to Medicare plans shown on the card"
+              },
+              "levelFundedPlan": {
+                "type": "boolean",
+                "description": "Level funded plan identified on the ID card"
+              }
+            },
+            "required": []
+          },
+          "additionalCoverageDetails": {
+            "type": "array",
+            "description": "Additional coverage details from the payer's eligibility record",
+            "items": {
+              "type": "object",
+              "properties": {
+                "planName": {
+                  "type": "string",
+                  "description": "Name of the additional or secondary insurance plan"
+                },
+                "payerId": {
+                  "type": "string",
+                  "description": "Payer ID of the secondary insurance"
+                },
+                "coverageStartDate": {
+                  "type": "string",
+                  "description": "Start date for additional coverage . Date in ISO8601 format",
+                  "example": "2024-06-15"
+                },
+                "coverageEndDate": {
+                  "type": "string",
+                  "description": "End date for additional coverage. Date in ISO8601 format",
+                  "example": "2025-06-14"
+                },
+                "memberId": {
+                  "type": "string",
+                  "description": "Member identification number returned from the payer"
+                }
+              },
+              "required": []
+            }
+          },
+          "primaryCareProviderDetails": {
+            "type": "array",
+            "description": "Primary care provider details from the payer's eligibility record",
+            "items": {
+              "type": "object",
+              "properties": {
+                "pcpFirstName": {
+                  "type": "string",
+                  "description": "First name of the primary care provider (PCP)"
+                },
+                "pcpLastName": {
+                  "type": "string",
+                  "description": "Last name of the primary care provider (PCP)"
+                },
+                "pcpContactNumber": {
+                  "type": "string",
+                  "description": "Contact number for the PCP"
+                },
+                "pcpAddress": {
+                  "type": "object",
+                  "description": "Address of the PCP",
+                  "properties": {
+                    "addressLine1": {
+                      "type": "string",
+                      "description": "Address line 1"
+                    },
+                    "addressLine2": {
+                      "type": "string",
+                      "description": "Address line 2"
+                    },
+                    "city": {
+                      "type": "string",
+                      "description": "City"
+                    },
+                    "state": {
+                      "type": "string",
+                      "description": "State"
+                    },
+                    "zip": {
+                      "type": "string",
+                      "description": "Zip"
+                    }
+                  }
+                },
+                "pcpType": {
+                  "type": "string",
+                  "description": "Type of PCP"
+                },
+                "pcpNPI": {
+                  "type": "string",
+                  "description": "National Provider Identifier for the PCP"
+                },
+                "pcpGroupNumber": {
+                  "type": "string",
+                  "description": "National Provider group number"
+                }
+              }
+            },
+            "required": []
+          },
+          "contractedServiceProvider": {
+            "type": "object",
+            "description": "Contracted service provider details from the payer's eligibility record",
+            "properties": {
+              "contractedServiceProviderName": {
+                "type": "string",
+                "description": "Contracted Service Provider Name"
+              },
+              "contractedServiceProviderAddress": {
+                "type": "object",
+                "description": "Contracted Service Provider address",
+                "properties": {
+                  "addressLine1": {
+                    "type": "string",
+                    "description": "Address line 1"
+                  },
+                  "addressLine2": {
+                    "type": "string",
+                    "description": "Address line 2"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "City"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "State"
+                  },
+                  "zip": {
+                    "type": "string",
+                    "description": "Zip"
+                  }
+                }
+              }
+            },
+            "required": []
+          },
+          "eligibilityAlert": {
+            "type": "array",
+            "description": "Eligibility alert details from the payer's eligibility record",
+            "items": {
+              "type": "object",
+              "properties": {
+                "eligibilityAlertType": {
+                  "type": "string",
+                  "description": "Alert type category - Eg: Patient data mismatch"
+                },
+                "alertDescription": {
+                  "type": "string",
+                  "description": "Payer/Clearing house alerts for the Eligibility transaction"
+                }
+              },
+              "required": []
+            }
+          }
+        },
+        "required": [
+          "patientDetails"
+        ]
+      },
+      "SubmitEligibilitySuccess": {
+        "type": "object",
+        "properties": {
+          "submitEligibility": {
+            "$ref": "#/components/schemas/SubmitEligibilitySuccessResponse"
+          }
+        }
+      },
+      "SubmitEligibilityFailure": {
+        "type": "object",
+        "properties": {
+          "submitEligibility": {
+            "$ref": "#/components/schemas/SubmitEligibilityFailure_submitEligibility"
+          }
+        }
+      },
+      "SubmitEligibilityFailure_submitEligibility": {
+        "type": "object",
+        "properties": {
+          "failureReason": {
+            "type": "string"
+          }
+        }
+      },
+      "SubmitEligibilityProgress": {
+        "type": "object",
+        "properties": {
+          "submitEligibility": {
+            "$ref": "#/components/schemas/SubmitEligibilityProgress_submitEligibility"
+          }
+        }
+      },
+      "SubmitEligibilityProgress_submitEligibility": {
+        "type": "object",
+        "properties": {
+          "progress": {
+            "type": "string"
+          }
+        }
+      },
+      "SubmitAuthorizationProgress": {
+        "type": "object",
+        "properties": {
+          "submitAuthorization": {
+            "$ref": "#/components/schemas/SubmitAuthorizationProgress_submitAuthorization"
+          }
+        }
+      },
+      "SubmitAuthorizationProgress_submitAuthorization": {
+        "type": "object",
+        "properties": {
+          "progress": {
+            "type": "string"
+          }
+        }
+      },
+      "WaystarGateway": {
+        "type": "object",
+        "properties": {
+          "gatewayName": {
+            "type": "string",
+            "enum": [
+              "Waystar"
+            ],
+            "description": "Clearinghouse/Payor to check eligibility"
+          },
+          "waystarSenderId": {
+            "type": "string",
+            "description": "Waystar Sender ID assigned to the client - Required for Waystar"
+          },
+          "waystarProviderName": {
+            "type": "string",
+            "description": "Waystar associated provider name assigned to the location servicing the patient - Required for Waystar"
+          }
+        },
+        "required": []
+      },
+      "UHCGateway": {
+        "type": "object",
+        "properties": {
+          "gatewayName": {
+            "type": "string",
+            "enum": [
+              "UHC"
+            ],
+            "description": "Clearinghouse/Payor to check eligibility"
+          },
+          "uhcTaxIdNumber": {
+            "type": "string",
+            "description": "TaxID loaded in the gateway for the given records location - UHC"
+          },
+          "uhcCorporateTaxOwnerId": {
+            "type": "string",
+            "description": "Corporate Tax Owner ID loaded in the gateway for the given records location - UHC"
+          },
+          "uhcPortalCareProvider": {
+            "type": "string",
+            "description": "Care Provider loaded in the gateway for the given records location - UHC"
+          }
+        },
+        "required": []
+      },
+      "AvailityGateway": {
+        "type": "object",
+        "properties": {
+          "gatewayName": {
+            "type": "string",
+            "enum": [
+              "Availity"
+            ],
+            "description": "Clearinghouse / Payor to check eligibility"
+          },
+          "availityProviderName": {
+            "type": "string",
+            "description": "Name of the provider to check eligibility with Availity"
+          }
+        },
+        "required": []
+      }
+    },
+    "responses": {
+      "UnauthorizedError": {
+        "description": "API key is missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AuthError"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "description": "API key provided by Element5 to authenticate and authorize the Element5 APIs",
+        "name": "X-API-Key",
+        "in": "header"
+      }
+    }
+  }
+}

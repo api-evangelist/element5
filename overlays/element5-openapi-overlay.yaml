@@ -1,0 +1,21 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Element5 API
+  version: 1.0.0
+extends: openapi/element5-openapi-original.json
+actions:
+- target: $.info
+  update:
+    x-apievangelist-provider: element5
+    x-apievangelist-sector: healthcare-rcm
+    x-apievangelist-async-model: submit-then-poll-or-webhook
+    x-apievangelist-auth: api-key (X-API-Key header)
+- target: $.info
+  update:
+    x-apievangelist-compliance:
+    - SOC 2
+    - HIPAA
+- target: $.tags
+  update:
+  - name: Automation
+    x-apievangelist-note: Generic E5 task submission, status, and webhook surface.

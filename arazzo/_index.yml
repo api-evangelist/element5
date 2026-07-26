@@ -1,0 +1,12 @@
+generated: '2026-07-19'
+method: derived
+source: openapi/element5-openapi-original.json
+workflows:
+- file: element5-verify-eligibility.yml
+  workflowId: verifyEligibility
+  title: Verify eligibility and await result
+  summary: Submit an eligibility request and poll its task status to completion.
+- file: element5-submit-authorization.yml
+  workflowId: submitAuthorization
+  title: Upload document and submit authorization
+  summary: Upload a supporting file object, submit a prior-authorization request, then poll status.

@@ -1,0 +1,40 @@
+# Element5
+
+> Element5 is a post-acute healthcare workflow automation platform. Its Neos AI agents automate revenue cycle management (RCM) and back-office operations — eligibility and benefit verification, prior authorization, claims processing, denials management, remittance/collections, and audit/compliance — for home health, hospice, and palliative care providers. The public Element5 API (v2.2.0) is API-key protected and lets clients submit authorization and eligibility requests, process X12 270/271 eligibility transactions, exchange files via an object store, and monitor long-running tasks by polling or via webhook callbacks.
+
+## APIs
+
+- [Element5 API documentation](https://api-doc.e5.ai/): API-key (X-API-Key header) protected workflow API; base URL https://api.e5.ai (non-prod https://api-qa.e5.ai).
+- [Element5 OpenAPI 3.1.0](https://raw.githubusercontent.com/api-evangelist/element5/refs/heads/main/openapi/element5-openapi-original.json): 8 operations across Automation, Object Store, Authorization, and Eligibility.
+
+## Operations
+
+- submitAuthorizationRequest — POST /wf/v2/workflows/submit-authorization
+- getSubmitAuthorizationRequestStatus — GET /wf/v2/workflows/submit-authorization/{task-id}
+- submitEligibilityRequest — POST /wf/v2/workflows/submit-eligibility
+- getSubmitEligibilityRequestStatus — GET /wf/v2/workflows/submit-eligibility/{task-id}
+- processX12EligibilityTransactionRequest — POST /wf/v2/workflows/process-x12-eligibility-transaction
+- getProcessX12EligibilityTransactionRequestStatus — GET /wf/v2/workflows/process-x12-eligibility-transaction/{task-id}
+- uploadFileObject — PUT /store/v1/file-object
+- getFileObject — GET /store/v1/file-object/{object-id}
+
+## Events (webhooks)
+
+- E5TaskEvents callback: task#queued, task#started, task#restarted, task#progressed, task#succeeded, task#failed
+
+## Artifacts
+
+- [Authentication profile](https://raw.githubusercontent.com/api-evangelist/element5/refs/heads/main/authentication/element5-authentication.yml)
+- [Conventions](https://raw.githubusercontent.com/api-evangelist/element5/refs/heads/main/conventions/element5-conventions.yml)
+- [Error catalog](https://raw.githubusercontent.com/api-evangelist/element5/refs/heads/main/errors/element5-problem-types.yml)
+- [Webhooks catalog](https://raw.githubusercontent.com/api-evangelist/element5/refs/heads/main/asyncapi/element5-webhooks.yml)
+- [Conformance (SOC 2, HIPAA, X12 270/271)](https://raw.githubusercontent.com/api-evangelist/element5/refs/heads/main/conformance/element5-conformance.yml)
+- [Data model](https://raw.githubusercontent.com/api-evangelist/element5/refs/heads/main/data-model/element5-data-model.yml)
+
+## Docs
+
+- [Element5 website](https://www.e5.ai/)
+- [Security & compliance](https://www.e5.ai/security)
+- [Privacy policy](https://www.e5.ai/privacy-policy)
+- [Application login](https://app.e5.ai/)
+- Support: apisupport@e5.ai

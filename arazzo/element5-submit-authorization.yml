@@ -1,0 +1,44 @@
+arazzo: 1.0.1
+info:
+  title: Element5 — Upload document and submit authorization
+  version: 1.0.0
+  description: Upload a supporting file object, submit a prior-authorization request, then poll status.
+sourceDescriptions:
+- name: element5
+  url: ../openapi/element5-openapi-original.json
+  type: openapi
+workflows:
+- workflowId: submitAuthorization
+  summary: Upload a document, submit an authorization request, and poll to completion.
+  inputs:
+    type: object
+    properties:
+      apiKey:
+        type: string
+      file:
+        type: string
+      payload:
+        type: object
+  steps:
+  - stepId: uploadDocument
+    operationId: uploadFileObject
+    requestBody:
+      payload: $inputs.file
+    outputs:
+      objectId: $response.body#/objectId
+  - stepId: submit
+    operationId: submitAuthorizationRequest
+    requestBody:
+      payload: $inputs.payload
+    outputs:
+      taskId: $response.body#/taskId
+  - stepId: checkStatus
+    operationId: getSubmitAuthorizationRequestStatus
+    parameters:
+    - name: task-id
+      in: path
+      value: $steps.submit.outputs.taskId
+    outputs:
+      status: $response.body#/status
+  outputs:
+    status: $steps.checkStatus.outputs.status

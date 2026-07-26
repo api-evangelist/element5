@@ -1,0 +1,23 @@
+generated: '2026-07-19'
+method: derived
+source: openapi/element5-openapi-original.json
+versioning:
+  scheme: uri-path
+  current: v2
+  observed:
+  - v1 (object store: /store/v1/...)
+  - v2 (workflows: /wf/v2/...)
+  docs: https://api-doc.e5.ai/
+spec_version: 2.2.0
+deprecation:
+  policy_url: null
+  sunset_header: false
+  notes: No published deprecation/sunset policy found. Several operations are labeled "(Draft)" in the spec.
+draft_operations:
+- openapi/element5-openapi-original.json#submitAuthorizationRequest
+- openapi/element5-openapi-original.json#processX12EligibilityTransactionRequest
+- openapi/element5-openapi-original.json#getProcessX12EligibilityTransactionRequestStatus
+sla:
+  url: null
+status_page: null
+deprecated_operations: []

@@ -1,0 +1,22 @@
+generated: '2026-07-19'
+method: searched
+source: https://api-doc.e5.ai/
+environments:
+- name: non-production
+  api_host: https://api-qa.e5.ai
+  blob_host: https://blob-qa.e5.ai
+  description: QA / non-production environment used for integration testing.
+- name: production
+  api_host: https://api.e5.ai
+  blob_host: https://blob.e5.ai
+  description: Live production environment.
+credentials:
+  model: api-key
+  notes: >-
+    API keys are provisioned by Element5 during onboarding (separate keys per environment). Element5
+    does not publish self-serve test keys or magic test identifiers; sandbox access is granted through
+    the onboarding process.
+test_values:
+  published: false
+  notes: No public test cards, magic identifiers, or fixtures are documented. This is an
+    onboarding-gated B2B healthcare API.

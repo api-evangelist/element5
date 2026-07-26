@@ -1,0 +1,45 @@
+generated: '2026-07-19'
+method: derived
+source: openapi/element5-openapi-original.json
+entities:
+- name: Task
+  description: A long-running workflow execution identified by a task-id, with a status
+    (Queued/Processing/Success/Failed) and a priority.
+  id_field: task-id
+- name: AuthorizationRequest
+  description: A prior-authorization submission workflow task.
+  id_field: task-id
+- name: EligibilityRequest
+  description: An eligibility/benefit verification submission workflow task.
+  id_field: task-id
+- name: X12EligibilityTransaction
+  description: A workflow that processes an X12 270 eligibility inquiry and returns a 271 response.
+  id_field: task-id
+- name: FileObject
+  description: A binary object (attachment) stored in the object store and referenced by document id.
+  id_field: object-id
+- name: WebhookEvent
+  description: A task lifecycle event delivered to the configured webhook URL.
+  id_field: eventId
+relationships:
+- from: AuthorizationRequest
+  to: Task
+  kind: is_a
+- from: EligibilityRequest
+  to: Task
+  kind: is_a
+- from: X12EligibilityTransaction
+  to: Task
+  kind: is_a
+- from: Task
+  to: FileObject
+  kind: has_many
+  via: attachment / document reference
+- from: WebhookEvent
+  to: Task
+  kind: belongs_to
+  via: eventPayload
+- from: FileObject
+  to: X12EligibilityTransaction
+  kind: has_many
+  via: Attachment270 / Attachment271

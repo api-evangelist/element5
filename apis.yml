@@ -1,8 +1,27 @@
 aid: element5
 name: Element5
-description: 'Element5 is a company surfaced as a portfolio company of insight-partners and added to the
-  API Evangelist network as a stub for enrichment. Sector: healthcare. This profile is a lead awaiting
-  the enrichment pipeline.'
+description: 'Element5 is a post-acute healthcare workflow automation platform that uses coordinated
+  AI agents (Neos) to automate revenue cycle management (RCM) and back-office operations for home
+  health, hospice, and palliative care providers. Its platform automates eligibility and benefit
+  verification, prior authorization submission, claims processing, denials management, remittance and
+  collections, and audit/compliance workflows, escalating only exceptions to human agents. Element5
+  exposes a public workflow API (Element5 API v2.2.0) protected by API keys that lets clients submit
+  authorization and eligibility requests, process X12 270/271 eligibility transactions, upload and fetch
+  file objects, and monitor long-running tasks via polling or webhook callbacks. The company is backed
+  by Insight Partners and serves the post-acute care sector.'
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://cdn.prod.website-files.com/658c60c4ff902effa2174f77/668c43e2bfb9956a2995b419_e5-logo-gradient.png
 url: https://raw.githubusercontent.com/api-evangelist/element5/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
@@ -12,16 +31,119 @@ x-tier: stub
 x-tier-reason: portfolio-lead
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-19'
 tags:
 - Company
 - Healthcare
-apis: []
+- Revenue Cycle Management
+- Post-Acute Care
+- Workflow Automation
+- Eligibility Verification
+- Prior Authorization
+- Claims Processing
+- Webhooks
+- Artificial Intelligence
+apis:
+- aid: element5:element5-authorization-api
+  name: Element5 Authorization API
+  description: Authorization related APIs
+  humanURL: https://api-doc.e5.ai/
+  baseURL: https://api.e5.ai
+  tags:
+  - Authorization
+  properties:
+  - type: OpenAPI
+    url: openapi/element5-authorization-api-openapi.yml
+  - type: Documentation
+    url: https://api-doc.e5.ai/
+  - type: APIReference
+    url: https://api-doc.e5.ai/
+- aid: element5:element5-eligibility-api
+  name: Element5 Eligibility API
+  description: Eligibility related APIs
+  humanURL: https://api-doc.e5.ai/
+  baseURL: https://api.e5.ai
+  tags:
+  - Eligibility
+  properties:
+  - type: OpenAPI
+    url: openapi/element5-eligibility-api-openapi.yml
+  - type: Documentation
+    url: https://api-doc.e5.ai/
+  - type: APIReference
+    url: https://api-doc.e5.ai/
+- aid: element5:element5-object-store-api
+  name: Element5 Object Store API
+  description: Object Store related APIs
+  humanURL: https://api-doc.e5.ai/
+  baseURL: https://api.e5.ai
+  tags:
+  - Object Store
+  properties:
+  - type: OpenAPI
+    url: openapi/element5-object-store-api-openapi.yml
+  - type: Documentation
+    url: https://api-doc.e5.ai/
+  - type: APIReference
+    url: https://api-doc.e5.ai/
+common:
+- type: AgenticAccess
+  url: agentic-access/element5-agentic-access.yml
+- type: DomainSecurity
+  url: security/element5-domain-security.yml
+- type: Authentication
+  url: authentication/element5-authentication.yml
+- type: Conventions
+  url: conventions/element5-conventions.yml
+- type: ErrorCatalog
+  url: errors/element5-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/element5-lifecycle.yml
+- type: Conformance
+  url: conformance/element5-conformance.yml
+- type: Webhooks
+  url: asyncapi/element5-webhooks.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: MCPServer
+  url: mcp/element5-mcp.yml
+- type: LLMsTxt
+  url: llms/element5-llms.txt
+- type: Overlay
+  url: overlays/element5-openapi-overlay.yaml
+- type: Sandbox
+  url: sandbox/element5-sandbox.yml
+- type: DataModel
+  url: data-model/element5-data-model.yml
+- type: Arazzo
+  name: Verify eligibility and await result
+  url: arazzo/element5-verify-eligibility.yml
+- type: Arazzo
+  name: Upload document and submit authorization
+  url: arazzo/element5-submit-authorization.yml
+- type: Website
+  url: https://www.e5.ai/
+- type: DeveloperPortal
+  url: https://api-doc.e5.ai/
+- type: Documentation
+  url: https://api-doc.e5.ai/
+- type: APIReference
+  url: https://api-doc.e5.ai/
+- type: Login
+  url: https://app.e5.ai/
+- type: PrivacyPolicy
+  url: https://www.e5.ai/privacy-policy
+- type: Support
+  url: mailto:apisupport@e5.ai
+- type: Compliance
+  url: https://www.e5.ai/security
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
-common:
-- type: Website
-  url: https://www.e5.ai/
+x-enrichment:
+  date: '2026-07-19'
+  status: backfilled
+  pass: local-v1
+  note: backfilled from .gitignore signal + verified work evidence

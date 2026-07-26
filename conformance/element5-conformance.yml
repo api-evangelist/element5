@@ -1,0 +1,28 @@
+generated: '2026-07-19'
+method: searched
+source: https://www.e5.ai/security
+notes: >-
+  Standards derived from the Element5 OpenAPI (X12 270/271 EDI eligibility, API-key auth) and from
+  the published compliance posture on the Element5 security page (SOC 2, HIPAA).
+standards:
+- id: soc2
+  conforms: true
+  evidence: AICPA SOC 2 badge published on https://www.e5.ai/security
+- id: hipaa
+  conforms: true
+  evidence: HIPAA verified badge published on https://www.e5.ai/security (healthcare PHI workflows)
+- id: x12-270-271
+  conforms: true
+  evidence: processX12EligibilityTransaction operations accept/return X12 270 (inquiry) and 271 (response) attachments
+- id: api-key-auth
+  conforms: true
+  evidence: openapi securityScheme type apiKey (X-API-Key header)
+- id: oauth2
+  conforms: false
+- id: oidc
+  conforms: false
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: errors use a custom {code,message} envelope, not application/problem+json
+- id: fhir-r4
+  conforms: false

@@ -1,0 +1,46 @@
+generated: '2026-07-19'
+method: derived
+source: openapi/element5-openapi-original.json
+authentication:
+  style: api-key
+  location: header
+  parameter: X-API-Key
+  notes: API key is issued by Element5 during onboarding. See authentication/element5-authentication.yml.
+async_model:
+  pattern: submit-then-poll-or-webhook
+  description: >-
+    Workflows are long-running. A POST submit endpoint returns a task with a task-id; clients track
+    completion either by polling the matching GET status endpoint or by receiving E5TaskEvents
+    webhook callbacks.
+  task_identifier: task-id
+  status_states:
+  - Queued
+  - Processing
+  - Failed
+  - Success
+  webhooks:
+    ref: asyncapi/element5-webhooks.yml
+    events:
+    - task#queued
+    - task#started
+    - task#restarted
+    - task#progressed
+    - task#succeeded
+    - task#failed
+idempotency:
+  supported: false
+  notes: No idempotency-key header or parameter is documented in the spec or docs.
+pagination:
+  supported: false
+  notes: No paginated list endpoints in the current API surface.
+versioning:
+  style: uri-path
+  ref: lifecycle/element5-lifecycle.yml
+error_envelope:
+  shape: '{ code: string, message: string }'
+  ref: errors/element5-problem-types.yml
+rate_limit_signaling:
+  documented: false
+object_store:
+  description: Binary payloads (e.g. authorization/eligibility attachments) are exchanged via the
+    /store/v1/file-object object store; a 302 redirect may be returned to a signed blob URL on fetch.

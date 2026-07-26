@@ -1,0 +1,35 @@
+generated: '2026-07-19'
+method: derived
+status: candidate
+source: openapi/element5-openapi-original.json
+notes: >-
+  No official hosted/remote Element5 MCP server was found (docs, npm @modelcontextprotocol, MCP
+  registries). This is a candidate tool list derived one-to-one from the OpenAPI operations.
+server:
+  name: element5
+  transport: http
+tools:
+- name: get_file_object
+  description: Fetch a file object from the object store by id.
+  source_operation: openapi/element5-openapi-original.json#getFileObject
+- name: upload_file_object
+  description: Upload a file object to the object store.
+  source_operation: openapi/element5-openapi-original.json#uploadFileObject
+- name: submit_authorization_request
+  description: Submit a prior-authorization workflow request.
+  source_operation: openapi/element5-openapi-original.json#submitAuthorizationRequest
+- name: get_authorization_request_status
+  description: Get the status of an authorization submission task.
+  source_operation: openapi/element5-openapi-original.json#getSubmitAuthorizationRequestStatus
+- name: submit_eligibility_request
+  description: Submit an eligibility/benefit verification workflow request.
+  source_operation: openapi/element5-openapi-original.json#submitEligibilityRequest
+- name: get_eligibility_request_status
+  description: Get the status of an eligibility submission task.
+  source_operation: openapi/element5-openapi-original.json#getSubmitEligibilityRequestStatus
+- name: process_x12_eligibility_transaction
+  description: Process an X12 270/271 eligibility transaction.
+  source_operation: openapi/element5-openapi-original.json#processX12EligibilityTransactionRequest
+- name: get_x12_eligibility_transaction_status
+  description: Get the status of an X12 eligibility transaction task.
+  source_operation: openapi/element5-openapi-original.json#getProcessX12EligibilityTransactionRequestStatus
