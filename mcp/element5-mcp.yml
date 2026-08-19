@@ -2,9 +2,8 @@ generated: '2026-07-19'
 method: derived
 status: candidate
 source: openapi/element5-openapi-original.json
-notes: >-
-  No official hosted/remote Element5 MCP server was found (docs, npm @modelcontextprotocol, MCP
-  registries). This is a candidate tool list derived one-to-one from the OpenAPI operations.
+notes: No official hosted/remote Element5 MCP server was found (docs, npm @modelcontextprotocol, MCP registries).
+  This is a candidate tool list derived one-to-one from the OpenAPI operations.
 server:
   name: element5
   transport: http
@@ -33,3 +32,9 @@ tools:
 - name: get_x12_eligibility_transaction_status
   description: Get the status of an X12 eligibility transaction task.
   source_operation: openapi/element5-openapi-original.json#getProcessX12EligibilityTransactionRequestStatus
+deployment:
+  mode: none
+  verified: derived
+  tools: 8
+  checked: '2026-08-12'
+  source: catalog MCP census

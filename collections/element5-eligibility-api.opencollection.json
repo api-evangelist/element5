@@ -1,0 +1,118 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Element5 Authorization Eligibility API",
+    "version": "2.2.0"
+  },
+  "request": {
+    "auth": {
+      "type": "apikey",
+      "key": "X-API-Key",
+      "value": "{{X-API-Key}}",
+      "placement": "header"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Eligibility",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Eligibility Submission Request",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-qa.e5.ai/wf/v2/workflows/submit-eligibility",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "X-API-Key",
+              "value": "{{X-API-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "All the necessary information required to submit an eligibility request. On receipt, the API performs a quick validation (not verification) of the request for correctness. On successful validation returns a `taskId` which can be used for tracking this request. Also, the `task#queued` event is triggered."
+        },
+        {
+          "info": {
+            "name": "Eligibility Submission Request Status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-qa.e5.ai/wf/v2/workflows/submit-eligibility/:task-id",
+            "params": [
+              {
+                "name": "task-id",
+                "value": "",
+                "type": "path",
+                "description": "Provide a task id to retreive the Eligibility Submission Request status"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-API-Key",
+              "value": "{{X-API-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Fetch the current status of an Eligibility Submission Request. It takes the `taskId`, provided by the Eligibility Submission Request, as input."
+        },
+        {
+          "info": {
+            "name": "Process X12 Eligibility Transaction (Draft)",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-qa.e5.ai/wf/v2/workflows/process-x12-eligibility-transaction",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "X-API-Key",
+              "value": "{{X-API-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "All the necessary information required to process a X12 Eligibility Transaction. On receipt, the API performs a quick validation (not verification) of the request for correctness. On successful validation returns a `taskId` which can be used for tracking this request. Also, the `task#queued` event is triggered."
+        },
+        {
+          "info": {
+            "name": "Process X12 Eligibility Transaction Status (Draft)",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-qa.e5.ai/wf/v2/workflows/process-x12-eligibility-transaction/:task-id",
+            "params": [
+              {
+                "name": "task-id",
+                "value": "",
+                "type": "path",
+                "description": "Provide a task id to retreive the Process X12 Eligibility Transaction status"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-API-Key",
+              "value": "{{X-API-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Fetch the current status of an Process X12 Eligibility Transaction. It takes the `taskId`, provided by the Process X12 Eligibility Transaction, as input."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,72 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Element5 Authorization Object Store API",
+    "version": "2.2.0"
+  },
+  "request": {
+    "auth": {
+      "type": "apikey",
+      "key": "X-API-Key",
+      "value": "{{X-API-Key}}",
+      "placement": "header"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Object Store",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Fetch the file object",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-qa.e5.ai/store/v1/file-object/:object-id",
+            "params": [
+              {
+                "name": "object-id",
+                "value": "",
+                "type": "path",
+                "description": "Provide a `object-id` to fetch the file object"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-API-Key",
+              "value": "{{X-API-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Fetch a file object by its `object-id`. The file may be delivered directly as binary content or via a redirect to a pre-signed URL."
+        },
+        {
+          "info": {
+            "name": "Upload a file object",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api-qa.e5.ai/store/v1/file-object",
+            "body": {
+              "type": "multipart-form",
+              "data": [
+                {
+                  "name": "file",
+                  "type": "text",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "docs": "Upload a file to S3 storage. The file is stored in a date-based folder structure (YYYY/MM/DD). Returns file object ID and download URL. Requires `file:write` scope in the authorization token."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

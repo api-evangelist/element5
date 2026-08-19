@@ -1,0 +1,560 @@
+{
+  "item": [
+    {
+      "id": "0166c026-f742-4ad0-8c5e-83f54f464deb",
+      "name": "Authorization",
+      "description": {
+        "content": "Authorization related APIs",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "08fcce48-3535-4138-a2b7-d830136bbdab",
+          "name": "Authorization Submission Request (Draft)",
+          "request": {
+            "name": "Authorization Submission Request (Draft)",
+            "description": {
+              "content": "All the necessary information required to submit an authorization. On receipt, the API performs a quick validation (not verification) of the request for correctness. On successful validation returns a `taskId` which can be used for tracking this request. Also, the `task#queued` event is triggered.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "wf",
+                "v2",
+                "workflows",
+                "submit-authorization"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "X-API-Key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskPayload\": {\n    \"patientDetails\": {\n      \"patientId\": \"<string>\",\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"dateOfBirth\": \"<date>\",\n      \"startOfCareDate\": \"<date>\",\n      \"patientAddress\": {\n        \"addressLine1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"addressLine2\": \"<string>\"\n      },\n      \"middleName\": \"<string>\",\n      \"gender\": \"<string>\"\n    },\n    \"episodeDetails\": {\n      \"soeDate\": \"<date>\",\n      \"eoeDate\": \"<date>\",\n      \"episodeId\": \"<string>\"\n    },\n    \"payerDetails\": {\n      \"payerPlanName\": \"<string>\",\n      \"memberId\": \"<string>\",\n      \"payerName\": \"<string>\",\n      \"payerType\": \"<string>\",\n      \"payerId\": \"<string>\",\n      \"payerHierarchy\": \"<string>\",\n      \"MBI\": \"<string>\",\n      \"medicaidId\": \"<string>\",\n      \"gatewayName\": \"<string>\"\n    },\n    \"servicingProviderDetails\": {\n      \"branch\": \"<string>\",\n      \"branchNPI\": \"<string>\",\n      \"serviceLine\": \"<string>\",\n      \"branchAddress\": {\n        \"addressLine1\": \"<string>\",\n        \"addressLine2\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\"\n      }\n    },\n    \"orderingProviderDetails\": {\n      \"orderingProviderNPI\": \"<string>\",\n      \"orderingProviderFirstName\": \"<string>\",\n      \"orderingProviderLastName\": \"<string>\",\n      \"orderingProviderAddress\": {\n        \"addressLine1\": \"<string>\",\n        \"addressLine2\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\"\n      }\n    },\n    \"referralInformation\": {\n      \"referralSource\": \"<string>\",\n      \"referringSourceName\": \"<string>\",\n      \"facilityDischargeDate\": \"<date>\"\n    },\n    \"authorizationRequest\": {\n      \"authType\": \"<string>\",\n      \"authRequestDetails\": [\n        {\n          \"serviceDiscipline\": \"<string>\",\n          \"requestedQty\": \"<integer>\",\n          \"requestedStartDate\": \"<date>\",\n          \"requestedEndDate\": \"<date>\",\n          \"procedureCodes\": \"<string>\"\n        },\n        {\n          \"serviceDiscipline\": \"<string>\",\n          \"requestedQty\": \"<integer>\",\n          \"requestedStartDate\": \"<date>\",\n          \"requestedEndDate\": \"<date>\",\n          \"procedureCodes\": \"<string>\"\n        }\n      ]\n    },\n    \"diagnosisDetails\": [\n      {\n        \"diagnosisCode\": \"<string>\",\n        \"sortOrder\": \"<integer>\"\n      },\n      {\n        \"diagnosisCode\": \"<string>\",\n        \"sortOrder\": \"<integer>\"\n      }\n    ],\n    \"senderDetails\": {\n      \"partnerName\": \"<string>\",\n      \"organizationName\": \"<string>\",\n      \"agencyName\": \"<string>\",\n      \"branchName\": \"<string>\"\n    },\n    \"attachments\": [\n      {\n        \"url\": \"<uri>\",\n        \"attachmentType\": \"<string>\",\n        \"attachmentName\": \"<string>\"\n      },\n      {\n        \"url\": \"<uri>\",\n        \"attachmentType\": \"<string>\",\n        \"attachmentName\": \"<string>\"\n      }\n    ]\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "70886c67-641e-48b2-a173-2033cc593a11",
+              "name": "Submit Authorization Request Created",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "submit-authorization"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"taskPayload\": {\n    \"patientDetails\": {\n      \"patientId\": \"BOX00003977\",\n      \"firstName\": \"John\",\n      \"lastName\": \"Smith\",\n      \"dateOfBirth\": \"1980-12-20\",\n      \"startOfCareDate\": \"2025-12-20\",\n      \"patientAddress\": {\n        \"addressLine1\": \"123 Broadway St\",\n        \"city\": \"Dallas\",\n        \"state\": \"TX\",\n        \"zip\": \"75001\",\n        \"addressLine2\": \"Apt 2\"\n      },\n      \"middleName\": \"Edward\",\n      \"gender\": \"M\"\n    },\n    \"episodeDetails\": {\n      \"soeDate\": \"2025-12-20\",\n      \"eoeDate\": \"2026-02-20\",\n      \"episodeId\": \"11111111\"\n    },\n    \"payerDetails\": {\n      \"payerPlanName\": \"AARP® Medicare Advantage from UnitedHealthcare\",\n      \"memberId\": \"W9837639\",\n      \"payerName\": \"UHC\",\n      \"payerType\": \"MA\",\n      \"payerId\": \"87726\",\n      \"payerHierarchy\": \"Primary\",\n      \"MBI\": \"6QQVX6CHJNVRO5\",\n      \"medicaidId\": \"500123456789\",\n      \"gatewayName\": \"Availity\"\n    },\n    \"servicingProviderDetails\": {\n      \"branch\": \"Sunshine Healthcare\",\n      \"branchNPI\": \"1427683941\",\n      \"serviceLine\": \"Home Health\",\n      \"branchAddress\": {\n        \"addressLine1\": \"123 Main St\",\n        \"addressLine2\": \"string\",\n        \"city\": \"Dallas\",\n        \"state\": \"TX\",\n        \"zip\": \"75001\"\n      }\n    },\n    \"orderingProviderDetails\": {\n      \"orderingProviderNPI\": \"1223455250\",\n      \"orderingProviderFirstName\": \"John\",\n      \"orderingProviderLastName\": \"Smith\",\n      \"orderingProviderAddress\": {\n        \"addressLine1\": \"123 Main St\",\n        \"addressLine2\": \"string\",\n        \"city\": \"Dallas\",\n        \"state\": \"TX\",\n        \"zip\": \"75001\"\n      }\n    },\n    \"referralInformation\": {\n      \"referralSource\": \"PHYSICIAN\",\n      \"referringSourceName\": \"Michael Scott\",\n      \"facilityDischargeDate\": \"2025-12-20\"\n    },\n    \"authorizationRequest\": {\n      \"authType\": \"Initial\",\n      \"authRequestDetails\": [\n        {\n          \"serviceDiscipline\": \"SN\",\n          \"requestedQty\": 10,\n          \"requestedStartDate\": \"2025-12-20\",\n          \"requestedEndDate\": \"2025-12-27\",\n          \"procedureCodes\": \"G0299, G0151, S9123, T1030\"\n        },\n        {\n          \"serviceDiscipline\": \"SN\",\n          \"requestedQty\": 10,\n          \"requestedStartDate\": \"2025-12-20\",\n          \"requestedEndDate\": \"2025-12-27\",\n          \"procedureCodes\": \"G0299, G0151, S9123, T1030\"\n        }\n      ]\n    },\n    \"diagnosisDetails\": [\n      {\n        \"diagnosisCode\": \"J44.9\",\n        \"sortOrder\": 1\n      },\n      {\n        \"diagnosisCode\": \"J44.9\",\n        \"sortOrder\": 1\n      }\n    ],\n    \"senderDetails\": {\n      \"partnerName\": \"Wellsky\",\n      \"organizationName\": \"11111-Affinity\",\n      \"agencyName\": \"Polk\",\n      \"branchName\": \"Branch1\"\n    },\n    \"attachments\": [\n      {\n        \"url\": \"https://NosmoNyZExYnsxQmLwYAfsJg.dhavow+u4NQd+AYUlcXORQZ8Y4tUst-CdnX-kh\",\n        \"attachmentType\": \"string\",\n        \"attachmentName\": \"string\"\n      },\n      {\n        \"url\": \"http://TK.funyr+iK,rNXx53Hr-5dkzSWtdy,Gr.vmG\",\n        \"attachmentType\": \"string\",\n        \"attachmentName\": \"string\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"taskId\": \"55dfe5e9-725a-4ce0-ba41-925e588623c2\",\n  \"taskName\": \"submit-authorization\",\n  \"createdAt\": \"2017-07-21T17:32:28Z\",\n  \"status\": \"queued\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4247da0b-4849-4a39-b197-5dfcbf2386b5",
+              "name": "Submit Authorization Request Failed",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "submit-authorization"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"taskPayload\": {\n    \"patientDetails\": {\n      \"patientId\": \"BOX00003977\",\n      \"firstName\": \"John\",\n      \"lastName\": \"Smith\",\n      \"dateOfBirth\": \"1980-12-20\",\n      \"startOfCareDate\": \"2025-12-20\",\n      \"patientAddress\": {\n        \"addressLine1\": \"123 Broadway St\",\n        \"city\": \"Dallas\",\n        \"state\": \"TX\",\n        \"zip\": \"75001\",\n        \"addressLine2\": \"Apt 2\"\n      },\n      \"middleName\": \"Edward\",\n      \"gender\": \"M\"\n    },\n    \"episodeDetails\": {\n      \"soeDate\": \"2025-12-20\",\n      \"eoeDate\": \"2026-02-20\",\n      \"episodeId\": \"11111111\"\n    },\n    \"payerDetails\": {\n      \"payerPlanName\": \"AARP® Medicare Advantage from UnitedHealthcare\",\n      \"memberId\": \"W9837639\",\n      \"payerName\": \"UHC\",\n      \"payerType\": \"MA\",\n      \"payerId\": \"87726\",\n      \"payerHierarchy\": \"Primary\",\n      \"MBI\": \"6QQVX6CHJNVRO5\",\n      \"medicaidId\": \"500123456789\",\n      \"gatewayName\": \"Availity\"\n    },\n    \"servicingProviderDetails\": {\n      \"branch\": \"Sunshine Healthcare\",\n      \"branchNPI\": \"1427683941\",\n      \"serviceLine\": \"Home Health\",\n      \"branchAddress\": {\n        \"addressLine1\": \"123 Main St\",\n        \"addressLine2\": \"string\",\n        \"city\": \"Dallas\",\n        \"state\": \"TX\",\n        \"zip\": \"75001\"\n      }\n    },\n    \"orderingProviderDetails\": {\n      \"orderingProviderNPI\": \"1223455250\",\n      \"orderingProviderFirstName\": \"John\",\n      \"orderingProviderLastName\": \"Smith\",\n      \"orderingProviderAddress\": {\n        \"addressLine1\": \"123 Main St\",\n        \"addressLine2\": \"string\",\n        \"city\": \"Dallas\",\n        \"state\": \"TX\",\n        \"zip\": \"75001\"\n      }\n    },\n    \"referralInformation\": {\n      \"referralSource\": \"PHYSICIAN\",\n      \"referringSourceName\": \"Michael Scott\",\n      \"facilityDischargeDate\": \"2025-12-20\"\n    },\n    \"authorizationRequest\": {\n      \"authType\": \"Initial\",\n      \"authRequestDetails\": [\n        {\n          \"serviceDiscipline\": \"SN\",\n          \"requestedQty\": 10,\n          \"requestedStartDate\": \"2025-12-20\",\n          \"requestedEndDate\": \"2025-12-27\",\n          \"procedureCodes\": \"G0299, G0151, S9123, T1030\"\n        },\n        {\n          \"serviceDiscipline\": \"SN\",\n          \"requestedQty\": 10,\n          \"requestedStartDate\": \"2025-12-20\",\n          \"requestedEndDate\": \"2025-12-27\",\n          \"procedureCodes\": \"G0299, G0151, S9123, T1030\"\n        }\n      ]\n    },\n    \"diagnosisDetails\": [\n      {\n        \"diagnosisCode\": \"J44.9\",\n        \"sortOrder\": 1\n      },\n      {\n        \"diagnosisCode\": \"J44.9\",\n        \"sortOrder\": 1\n      }\n    ],\n    \"senderDetails\": {\n      \"partnerName\": \"Wellsky\",\n      \"organizationName\": \"11111-Affinity\",\n      \"agencyName\": \"Polk\",\n      \"branchName\": \"Branch1\"\n    },\n    \"attachments\": [\n      {\n        \"url\": \"https://NosmoNyZExYnsxQmLwYAfsJg.dhavow+u4NQd+AYUlcXORQZ8Y4tUst-CdnX-kh\",\n        \"attachmentType\": \"string\",\n        \"attachmentName\": \"string\"\n      },\n      {\n        \"url\": \"http://TK.funyr+iK,rNXx53Hr-5dkzSWtdy,Gr.vmG\",\n        \"attachmentType\": \"string\",\n        \"attachmentName\": \"string\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"failed\",\n  \"reason\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4e1758ae-f265-467f-91d0-35e3f1100edd",
+              "name": "API key is missing or invalid",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "submit-authorization"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"taskPayload\": {\n    \"patientDetails\": {\n      \"patientId\": \"BOX00003977\",\n      \"firstName\": \"John\",\n      \"lastName\": \"Smith\",\n      \"dateOfBirth\": \"1980-12-20\",\n      \"startOfCareDate\": \"2025-12-20\",\n      \"patientAddress\": {\n        \"addressLine1\": \"123 Broadway St\",\n        \"city\": \"Dallas\",\n        \"state\": \"TX\",\n        \"zip\": \"75001\",\n        \"addressLine2\": \"Apt 2\"\n      },\n      \"middleName\": \"Edward\",\n      \"gender\": \"M\"\n    },\n    \"episodeDetails\": {\n      \"soeDate\": \"2025-12-20\",\n      \"eoeDate\": \"2026-02-20\",\n      \"episodeId\": \"11111111\"\n    },\n    \"payerDetails\": {\n      \"payerPlanName\": \"AARP® Medicare Advantage from UnitedHealthcare\",\n      \"memberId\": \"W9837639\",\n      \"payerName\": \"UHC\",\n      \"payerType\": \"MA\",\n      \"payerId\": \"87726\",\n      \"payerHierarchy\": \"Primary\",\n      \"MBI\": \"6QQVX6CHJNVRO5\",\n      \"medicaidId\": \"500123456789\",\n      \"gatewayName\": \"Availity\"\n    },\n    \"servicingProviderDetails\": {\n      \"branch\": \"Sunshine Healthcare\",\n      \"branchNPI\": \"1427683941\",\n      \"serviceLine\": \"Home Health\",\n      \"branchAddress\": {\n        \"addressLine1\": \"123 Main St\",\n        \"addressLine2\": \"string\",\n        \"city\": \"Dallas\",\n        \"state\": \"TX\",\n        \"zip\": \"75001\"\n      }\n    },\n    \"orderingProviderDetails\": {\n      \"orderingProviderNPI\": \"1223455250\",\n      \"orderingProviderFirstName\": \"John\",\n      \"orderingProviderLastName\": \"Smith\",\n      \"orderingProviderAddress\": {\n        \"addressLine1\": \"123 Main St\",\n        \"addressLine2\": \"string\",\n        \"city\": \"Dallas\",\n        \"state\": \"TX\",\n        \"zip\": \"75001\"\n      }\n    },\n    \"referralInformation\": {\n      \"referralSource\": \"PHYSICIAN\",\n      \"referringSourceName\": \"Michael Scott\",\n      \"facilityDischargeDate\": \"2025-12-20\"\n    },\n    \"authorizationRequest\": {\n      \"authType\": \"Initial\",\n      \"authRequestDetails\": [\n        {\n          \"serviceDiscipline\": \"SN\",\n          \"requestedQty\": 10,\n          \"requestedStartDate\": \"2025-12-20\",\n          \"requestedEndDate\": \"2025-12-27\",\n          \"procedureCodes\": \"G0299, G0151, S9123, T1030\"\n        },\n        {\n          \"serviceDiscipline\": \"SN\",\n          \"requestedQty\": 10,\n          \"requestedStartDate\": \"2025-12-20\",\n          \"requestedEndDate\": \"2025-12-27\",\n          \"procedureCodes\": \"G0299, G0151, S9123, T1030\"\n        }\n      ]\n    },\n    \"diagnosisDetails\": [\n      {\n        \"diagnosisCode\": \"J44.9\",\n        \"sortOrder\": 1\n      },\n      {\n        \"diagnosisCode\": \"J44.9\",\n        \"sortOrder\": 1\n      }\n    ],\n    \"senderDetails\": {\n      \"partnerName\": \"Wellsky\",\n      \"organizationName\": \"11111-Affinity\",\n      \"agencyName\": \"Polk\",\n      \"branchName\": \"Branch1\"\n    },\n    \"attachments\": [\n      {\n        \"url\": \"https://NosmoNyZExYnsxQmLwYAfsJg.dhavow+u4NQd+AYUlcXORQZ8Y4tUst-CdnX-kh\",\n        \"attachmentType\": \"string\",\n        \"attachmentName\": \"string\"\n      },\n      {\n        \"url\": \"http://TK.funyr+iK,rNXx53Hr-5dkzSWtdy,Gr.vmG\",\n        \"attachmentType\": \"string\",\n        \"attachmentName\": \"string\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": \"401\",\n  \"message\": \"API key is missing or invalid\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c6a24c1c-1c30-4c7a-ba8c-daa4f62407d6",
+              "name": "Access forbidden. The API key is valid but does not have permission to access this resource.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "submit-authorization"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"taskPayload\": {\n    \"patientDetails\": {\n      \"patientId\": \"BOX00003977\",\n      \"firstName\": \"John\",\n      \"lastName\": \"Smith\",\n      \"dateOfBirth\": \"1980-12-20\",\n      \"startOfCareDate\": \"2025-12-20\",\n      \"patientAddress\": {\n        \"addressLine1\": \"123 Broadway St\",\n        \"city\": \"Dallas\",\n        \"state\": \"TX\",\n        \"zip\": \"75001\",\n        \"addressLine2\": \"Apt 2\"\n      },\n      \"middleName\": \"Edward\",\n      \"gender\": \"M\"\n    },\n    \"episodeDetails\": {\n      \"soeDate\": \"2025-12-20\",\n      \"eoeDate\": \"2026-02-20\",\n      \"episodeId\": \"11111111\"\n    },\n    \"payerDetails\": {\n      \"payerPlanName\": \"AARP® Medicare Advantage from UnitedHealthcare\",\n      \"memberId\": \"W9837639\",\n      \"payerName\": \"UHC\",\n      \"payerType\": \"MA\",\n      \"payerId\": \"87726\",\n      \"payerHierarchy\": \"Primary\",\n      \"MBI\": \"6QQVX6CHJNVRO5\",\n      \"medicaidId\": \"500123456789\",\n      \"gatewayName\": \"Availity\"\n    },\n    \"servicingProviderDetails\": {\n      \"branch\": \"Sunshine Healthcare\",\n      \"branchNPI\": \"1427683941\",\n      \"serviceLine\": \"Home Health\",\n      \"branchAddress\": {\n        \"addressLine1\": \"123 Main St\",\n        \"addressLine2\": \"string\",\n        \"city\": \"Dallas\",\n        \"state\": \"TX\",\n        \"zip\": \"75001\"\n      }\n    },\n    \"orderingProviderDetails\": {\n      \"orderingProviderNPI\": \"1223455250\",\n      \"orderingProviderFirstName\": \"John\",\n      \"orderingProviderLastName\": \"Smith\",\n      \"orderingProviderAddress\": {\n        \"addressLine1\": \"123 Main St\",\n        \"addressLine2\": \"string\",\n        \"city\": \"Dallas\",\n        \"state\": \"TX\",\n        \"zip\": \"75001\"\n      }\n    },\n    \"referralInformation\": {\n      \"referralSource\": \"PHYSICIAN\",\n      \"referringSourceName\": \"Michael Scott\",\n      \"facilityDischargeDate\": \"2025-12-20\"\n    },\n    \"authorizationRequest\": {\n      \"authType\": \"Initial\",\n      \"authRequestDetails\": [\n        {\n          \"serviceDiscipline\": \"SN\",\n          \"requestedQty\": 10,\n          \"requestedStartDate\": \"2025-12-20\",\n          \"requestedEndDate\": \"2025-12-27\",\n          \"procedureCodes\": \"G0299, G0151, S9123, T1030\"\n        },\n        {\n          \"serviceDiscipline\": \"SN\",\n          \"requestedQty\": 10,\n          \"requestedStartDate\": \"2025-12-20\",\n          \"requestedEndDate\": \"2025-12-27\",\n          \"procedureCodes\": \"G0299, G0151, S9123, T1030\"\n        }\n      ]\n    },\n    \"diagnosisDetails\": [\n      {\n        \"diagnosisCode\": \"J44.9\",\n        \"sortOrder\": 1\n      },\n      {\n        \"diagnosisCode\": \"J44.9\",\n        \"sortOrder\": 1\n      }\n    ],\n    \"senderDetails\": {\n      \"partnerName\": \"Wellsky\",\n      \"organizationName\": \"11111-Affinity\",\n      \"agencyName\": \"Polk\",\n      \"branchName\": \"Branch1\"\n    },\n    \"attachments\": [\n      {\n        \"url\": \"https://NosmoNyZExYnsxQmLwYAfsJg.dhavow+u4NQd+AYUlcXORQZ8Y4tUst-CdnX-kh\",\n        \"attachmentType\": \"string\",\n        \"attachmentName\": \"string\"\n      },\n      {\n        \"url\": \"http://TK.funyr+iK,rNXx53Hr-5dkzSWtdy,Gr.vmG\",\n        \"attachmentType\": \"string\",\n        \"attachmentName\": \"string\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": \"403\",\n  \"message\": \"Access forbidden. The API key is valid but does not have permission to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "96a93eb1-7b49-4d7b-821e-099a62f8c92b",
+          "name": "Authorization Submission Request Status",
+          "request": {
+            "name": "Authorization Submission Request Status",
+            "description": {
+              "content": "Fetch the current status of a Authorization Submission Request. It takes the `taskId`, provided by the Authorization Submission Request, as input.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "wf",
+                "v2",
+                "workflows",
+                "submit-authorization",
+                ":task-id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "task-id",
+                  "description": "(Required) Provide a task id to retreive the Authorization Submission Request status"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "X-API-Key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "37c577b9-f523-4e10-ad5d-9c55276e3961",
+              "name": "Status of a Authorization Submission Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "submit-authorization",
+                    ":task-id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "task-id",
+                      "description": "(Required) Provide a task id to retreive the Authorization Submission Request status"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"taskId\": \"55dfe5e9-725a-4ce0-ba41-925e588623c2\",\n  \"taskName\": \"submit-authorization\",\n  \"createdAt\": \"2017-07-21T17:32:28Z\",\n  \"status\": \"processing\",\n  \"startedAt\": \"2017-07-21T17:32:28Z\",\n  \"attempt\": 1\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "0764107f-3a4e-42a2-b94c-d0371ba63960",
+              "name": "API key is missing or invalid",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "submit-authorization",
+                    ":task-id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "task-id",
+                      "description": "(Required) Provide a task id to retreive the Authorization Submission Request status"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": \"401\",\n  \"message\": \"API key is missing or invalid\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "dc4213c1-8a65-4d2c-b77c-3d77075168ea",
+              "name": "Access forbidden. The API key is valid but does not have permission to access this resource.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "submit-authorization",
+                    ":task-id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "task-id",
+                      "description": "(Required) Provide a task id to retreive the Authorization Submission Request status"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": \"403\",\n  \"message\": \"Access forbidden. The API key is valid but does not have permission to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api-qa.e5.ai",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "X-API-Key"
+      },
+      {
+        "key": "value",
+        "value": "{{apiKey}}"
+      },
+      {
+        "key": "in",
+        "value": "header"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "2a07f88d-5538-4148-89c4-b8a5704eee9f",
+    "name": "Element5 Authorization API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Element5 APIs enables the clients to invoke and monitor Element5 Workflows. The E5 APIs are protected by API keys and the keys would be shared during the onboarding process. Due to the long running nature of workflows the current state of the workflows can be tracked either by polling E5 APIs for status or exposing a webhook which will be notified about progress. The below sections highlight the APIs and events which would be relevant for the current engagement.\n\n# Authentication\n\n<!-- ReDoc-Inject: <security-definitions> -->\n\nContact Support:\n Email: apisupport@e5.ai",
+      "type": "text/plain"
+    }
+  }
+}

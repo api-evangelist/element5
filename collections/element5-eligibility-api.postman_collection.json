@@ -1,0 +1,1017 @@
+{
+  "item": [
+    {
+      "id": "df91affc-0016-4025-a933-11ae892130e0",
+      "name": "Eligibility",
+      "description": {
+        "content": "Eligibility related APIs",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "a6a1abbd-3b25-4aac-9835-af8f4c4f14fe",
+          "name": "Eligibility Submission Request",
+          "request": {
+            "name": "Eligibility Submission Request",
+            "description": {
+              "content": "All the necessary information required to submit an eligibility request. On receipt, the API performs a quick validation (not verification) of the request for correctness. On successful validation returns a `taskId` which can be used for tracking this request. Also, the `task#queued` event is triggered.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "wf",
+                "v2",
+                "workflows",
+                "submit-eligibility"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "X-API-Key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskPayload\": {\n    \"patientDetails\": {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"dateOfBirth\": \"<date>\",\n      \"patientId\": \"<string>\",\n      \"gender\": \"<string>\",\n      \"middleName\": \"<string>\",\n      \"startOfCareDate\": \"<date>\",\n      \"patientAddress\": {\n        \"addressLine1\": \"<string>\",\n        \"addressLine2\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\"\n      }\n    },\n    \"payerDetails\": {\n      \"payerPlanName\": \"<string>\",\n      \"payerName\": \"<string>\",\n      \"payerType\": \"<string>\",\n      \"memberId\": \"<string>\",\n      \"payerId\": \"<string>\",\n      \"payerHierarchy\": \"<string>\",\n      \"MBI\": \"<string>\",\n      \"medicaidID\": \"<string>\"\n    },\n    \"servicingProviderDetails\": {\n      \"branch\": \"<string>\",\n      \"branchNPI\": \"<string>\",\n      \"branchAddress\": {\n        \"addressLine1\": \"<string>\",\n        \"addressLine2\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\"\n      }\n    },\n    \"serviceTypeCodes\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"senderDetails\": {\n      \"partnerName\": \"<string>\",\n      \"organizationName\": \"<string>\",\n      \"agencyName\": \"<string>\",\n      \"branchName\": \"<string>\"\n    },\n    \"gateway\": {\n      \"gatewayName\": \"<string>\",\n      \"waystarSenderId\": \"<string>\",\n      \"waystarProviderName\": \"<string>\"\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "d7eb028b-db82-454c-92bb-6b5249664fcc",
+              "name": "Submit Eligibility Request Created",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "submit-eligibility"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"taskPayload\": {\n    \"patientDetails\": {\n      \"firstName\": \"string\",\n      \"lastName\": \"string\",\n      \"dateOfBirth\": \"1945-01-15\",\n      \"patientId\": \"string\",\n      \"gender\": \"F\",\n      \"middleName\": \"string\",\n      \"startOfCareDate\": \"2024-06-15\",\n      \"patientAddress\": {\n        \"addressLine1\": \"string\",\n        \"addressLine2\": \"string\",\n        \"city\": \"string\",\n        \"state\": \"string\",\n        \"zip\": \"string\"\n      }\n    },\n    \"payerDetails\": {\n      \"payerPlanName\": \"string\",\n      \"payerName\": \"string\",\n      \"payerType\": \"string\",\n      \"memberId\": \"string\",\n      \"payerId\": \"string\",\n      \"payerHierarchy\": \"T\",\n      \"MBI\": \"string\",\n      \"medicaidID\": \"string\"\n    },\n    \"servicingProviderDetails\": {\n      \"branch\": \"string\",\n      \"branchNPI\": \"string\",\n      \"branchAddress\": {\n        \"addressLine1\": \"string\",\n        \"addressLine2\": \"string\",\n        \"city\": \"string\",\n        \"state\": \"string\",\n        \"zip\": \"string\"\n      }\n    },\n    \"serviceTypeCodes\": [\n      \"42\",\n      \"42\"\n    ],\n    \"senderDetails\": {\n      \"partnerName\": \"Wellsky\",\n      \"organizationName\": \"11111-Affinity\",\n      \"agencyName\": \"Polk\",\n      \"branchName\": \"Branch1\"\n    },\n    \"gateway\": {\n      \"gatewayName\": \"Waystar\",\n      \"waystarSenderId\": \"string\",\n      \"waystarProviderName\": \"string\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"taskId\": \"55dfe5e9-725a-4ce0-ba41-925e588623c2\",\n  \"taskName\": \"submit-eligibility\",\n  \"createdAt\": \"2017-07-21T17:32:28Z\",\n  \"status\": \"queued\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "77e23280-3f4e-4ff0-ae43-759d025c45f9",
+              "name": "Submit Eligibility Request Failed",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "submit-eligibility"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"taskPayload\": {\n    \"patientDetails\": {\n      \"firstName\": \"string\",\n      \"lastName\": \"string\",\n      \"dateOfBirth\": \"1945-01-15\",\n      \"patientId\": \"string\",\n      \"gender\": \"F\",\n      \"middleName\": \"string\",\n      \"startOfCareDate\": \"2024-06-15\",\n      \"patientAddress\": {\n        \"addressLine1\": \"string\",\n        \"addressLine2\": \"string\",\n        \"city\": \"string\",\n        \"state\": \"string\",\n        \"zip\": \"string\"\n      }\n    },\n    \"payerDetails\": {\n      \"payerPlanName\": \"string\",\n      \"payerName\": \"string\",\n      \"payerType\": \"string\",\n      \"memberId\": \"string\",\n      \"payerId\": \"string\",\n      \"payerHierarchy\": \"T\",\n      \"MBI\": \"string\",\n      \"medicaidID\": \"string\"\n    },\n    \"servicingProviderDetails\": {\n      \"branch\": \"string\",\n      \"branchNPI\": \"string\",\n      \"branchAddress\": {\n        \"addressLine1\": \"string\",\n        \"addressLine2\": \"string\",\n        \"city\": \"string\",\n        \"state\": \"string\",\n        \"zip\": \"string\"\n      }\n    },\n    \"serviceTypeCodes\": [\n      \"42\",\n      \"42\"\n    ],\n    \"senderDetails\": {\n      \"partnerName\": \"Wellsky\",\n      \"organizationName\": \"11111-Affinity\",\n      \"agencyName\": \"Polk\",\n      \"branchName\": \"Branch1\"\n    },\n    \"gateway\": {\n      \"gatewayName\": \"Waystar\",\n      \"waystarSenderId\": \"string\",\n      \"waystarProviderName\": \"string\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"failed\",\n  \"reason\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "51ec606b-5155-4669-bfd8-afb4b171ae7a",
+              "name": "API key is missing or invalid",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "submit-eligibility"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"taskPayload\": {\n    \"patientDetails\": {\n      \"firstName\": \"string\",\n      \"lastName\": \"string\",\n      \"dateOfBirth\": \"1945-01-15\",\n      \"patientId\": \"string\",\n      \"gender\": \"F\",\n      \"middleName\": \"string\",\n      \"startOfCareDate\": \"2024-06-15\",\n      \"patientAddress\": {\n        \"addressLine1\": \"string\",\n        \"addressLine2\": \"string\",\n        \"city\": \"string\",\n        \"state\": \"string\",\n        \"zip\": \"string\"\n      }\n    },\n    \"payerDetails\": {\n      \"payerPlanName\": \"string\",\n      \"payerName\": \"string\",\n      \"payerType\": \"string\",\n      \"memberId\": \"string\",\n      \"payerId\": \"string\",\n      \"payerHierarchy\": \"T\",\n      \"MBI\": \"string\",\n      \"medicaidID\": \"string\"\n    },\n    \"servicingProviderDetails\": {\n      \"branch\": \"string\",\n      \"branchNPI\": \"string\",\n      \"branchAddress\": {\n        \"addressLine1\": \"string\",\n        \"addressLine2\": \"string\",\n        \"city\": \"string\",\n        \"state\": \"string\",\n        \"zip\": \"string\"\n      }\n    },\n    \"serviceTypeCodes\": [\n      \"42\",\n      \"42\"\n    ],\n    \"senderDetails\": {\n      \"partnerName\": \"Wellsky\",\n      \"organizationName\": \"11111-Affinity\",\n      \"agencyName\": \"Polk\",\n      \"branchName\": \"Branch1\"\n    },\n    \"gateway\": {\n      \"gatewayName\": \"Waystar\",\n      \"waystarSenderId\": \"string\",\n      \"waystarProviderName\": \"string\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": \"401\",\n  \"message\": \"API key is missing or invalid\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7f1e3425-9b2b-4649-b9e7-7c47a3452fd5",
+              "name": "Access forbidden. The API key is valid but does not have permission to access this resource.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "submit-eligibility"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"taskPayload\": {\n    \"patientDetails\": {\n      \"firstName\": \"string\",\n      \"lastName\": \"string\",\n      \"dateOfBirth\": \"1945-01-15\",\n      \"patientId\": \"string\",\n      \"gender\": \"F\",\n      \"middleName\": \"string\",\n      \"startOfCareDate\": \"2024-06-15\",\n      \"patientAddress\": {\n        \"addressLine1\": \"string\",\n        \"addressLine2\": \"string\",\n        \"city\": \"string\",\n        \"state\": \"string\",\n        \"zip\": \"string\"\n      }\n    },\n    \"payerDetails\": {\n      \"payerPlanName\": \"string\",\n      \"payerName\": \"string\",\n      \"payerType\": \"string\",\n      \"memberId\": \"string\",\n      \"payerId\": \"string\",\n      \"payerHierarchy\": \"T\",\n      \"MBI\": \"string\",\n      \"medicaidID\": \"string\"\n    },\n    \"servicingProviderDetails\": {\n      \"branch\": \"string\",\n      \"branchNPI\": \"string\",\n      \"branchAddress\": {\n        \"addressLine1\": \"string\",\n        \"addressLine2\": \"string\",\n        \"city\": \"string\",\n        \"state\": \"string\",\n        \"zip\": \"string\"\n      }\n    },\n    \"serviceTypeCodes\": [\n      \"42\",\n      \"42\"\n    ],\n    \"senderDetails\": {\n      \"partnerName\": \"Wellsky\",\n      \"organizationName\": \"11111-Affinity\",\n      \"agencyName\": \"Polk\",\n      \"branchName\": \"Branch1\"\n    },\n    \"gateway\": {\n      \"gatewayName\": \"Waystar\",\n      \"waystarSenderId\": \"string\",\n      \"waystarProviderName\": \"string\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": \"403\",\n  \"message\": \"Access forbidden. The API key is valid but does not have permission to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "70f77c88-f412-42c2-ac7e-62ad1519b7a2",
+          "name": "Eligibility Submission Request Status",
+          "request": {
+            "name": "Eligibility Submission Request Status",
+            "description": {
+              "content": "Fetch the current status of an Eligibility Submission Request. It takes the `taskId`, provided by the Eligibility Submission Request, as input.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "wf",
+                "v2",
+                "workflows",
+                "submit-eligibility",
+                ":task-id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "task-id",
+                  "description": "(Required) Provide a task id to retreive the Eligibility Submission Request status"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "X-API-Key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "9cbeab59-0062-4314-b1eb-fc2d8395dabf",
+              "name": "Status of an Eligibility Submission Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "submit-eligibility",
+                    ":task-id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "task-id",
+                      "description": "(Required) Provide a task id to retreive the Eligibility Submission Request status"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"taskId\": \"55dfe5e9-725a-4ce0-ba41-925e588623c2\",\n  \"taskName\": \"submit-eligibility\",\n  \"createdAt\": \"2017-07-21T17:32:28Z\",\n  \"status\": \"processing\",\n  \"startedAt\": \"2017-07-21T17:32:28Z\",\n  \"attempt\": 1\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "35dd17ba-6b23-42ff-9b7e-26b1a5a6b5ab",
+              "name": "API key is missing or invalid",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "submit-eligibility",
+                    ":task-id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "task-id",
+                      "description": "(Required) Provide a task id to retreive the Eligibility Submission Request status"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": \"401\",\n  \"message\": \"API key is missing or invalid\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "272523a0-5cd0-4684-b2dc-d9a97d3c20d8",
+              "name": "Access forbidden. The API key is valid but does not have permission to access this resource.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "submit-eligibility",
+                    ":task-id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "task-id",
+                      "description": "(Required) Provide a task id to retreive the Eligibility Submission Request status"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": \"403\",\n  \"message\": \"Access forbidden. The API key is valid but does not have permission to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "da716ab1-e96d-4c28-a360-fcf265a31b2f",
+          "name": "Process X12 Eligibility Transaction (Draft)",
+          "request": {
+            "name": "Process X12 Eligibility Transaction (Draft)",
+            "description": {
+              "content": "All the necessary information required to process a X12 Eligibility Transaction. On receipt, the API performs a quick validation (not verification) of the request for correctness. On successful validation returns a `taskId` which can be used for tracking this request. Also, the `task#queued` event is triggered.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "wf",
+                "v2",
+                "workflows",
+                "process-x12-eligibility-transaction"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "X-API-Key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskPayload\": {\n    \"transactionFiles\": {\n      \"requestFile\": {\n        \"uri\": {},\n        \"interchangeDate\": \"<date>\",\n        \"interchangeTime\": \"<string>\",\n        \"interchangeTimezone\": \"<string>\"\n      },\n      \"responseFile\": {\n        \"uri\": {},\n        \"interchangeDate\": \"<date>\",\n        \"interchangeTime\": \"<string>\",\n        \"interchangeTimezone\": \"<string>\"\n      }\n    },\n    \"meta\": {\n      \"senderDetails\": {\n        \"partnerName\": \"<string>\",\n        \"organizationName\": \"<string>\",\n        \"agencyName\": \"<string>\",\n        \"branchName\": \"<string>\"\n      },\n      \"patientDetails\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"patientID\": \"<string>\",\n        \"dateOfBirth\": \"<date>\",\n        \"startOfCareDate\": \"<date>\",\n        \"middleName\": \"<string>\"\n      },\n      \"payerDetails\": {\n        \"memberId\": \"<string>\"\n      },\n      \"gatewayName\": \"<string>\",\n      \"eligibilityRequestInitiationDate\": \"<date>\"\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "8fed5786-c750-4539-b21a-796720ed3ae3",
+              "name": "Status of a Process X12 Eligibility Transaction Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "process-x12-eligibility-transaction"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"taskPayload\": {\n    \"transactionFiles\": {\n      \"requestFile\": {\n        \"uri\": {},\n        \"interchangeDate\": \"2021-12-19\",\n        \"interchangeTime\": \"string\",\n        \"interchangeTimezone\": \"string\"\n      },\n      \"responseFile\": {\n        \"uri\": {},\n        \"interchangeDate\": \"1980-04-18\",\n        \"interchangeTime\": \"string\",\n        \"interchangeTimezone\": \"string\"\n      }\n    },\n    \"meta\": {\n      \"senderDetails\": {\n        \"partnerName\": \"Wellsky\",\n        \"organizationName\": \"11111-Affinity\",\n        \"agencyName\": \"Polk\",\n        \"branchName\": \"Branch1\"\n      },\n      \"patientDetails\": {\n        \"firstName\": \"John\",\n        \"lastName\": \"Smith\",\n        \"patientID\": \"BOX00003977\",\n        \"dateOfBirth\": \"1981-12-25\",\n        \"startOfCareDate\": \"1981-12-25\",\n        \"middleName\": \"Edward\"\n      },\n      \"payerDetails\": {\n        \"memberId\": \"W9837639\"\n      },\n      \"gatewayName\": \"Inovalon\",\n      \"eligibilityRequestInitiationDate\": \"1981-12-25\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"taskId\": \"55dfe5e9-725a-4ce0-ba41-925e588623c2\",\n  \"taskName\": \"process-x12-eligibility-transaction\",\n  \"createdAt\": \"2017-07-21T17:32:28Z\",\n  \"status\": \"queued\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "769c8b0c-8a84-4baf-98c7-91f1e5f6a0ad",
+              "name": "API key is missing or invalid",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "process-x12-eligibility-transaction"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"taskPayload\": {\n    \"transactionFiles\": {\n      \"requestFile\": {\n        \"uri\": {},\n        \"interchangeDate\": \"2021-12-19\",\n        \"interchangeTime\": \"string\",\n        \"interchangeTimezone\": \"string\"\n      },\n      \"responseFile\": {\n        \"uri\": {},\n        \"interchangeDate\": \"1980-04-18\",\n        \"interchangeTime\": \"string\",\n        \"interchangeTimezone\": \"string\"\n      }\n    },\n    \"meta\": {\n      \"senderDetails\": {\n        \"partnerName\": \"Wellsky\",\n        \"organizationName\": \"11111-Affinity\",\n        \"agencyName\": \"Polk\",\n        \"branchName\": \"Branch1\"\n      },\n      \"patientDetails\": {\n        \"firstName\": \"John\",\n        \"lastName\": \"Smith\",\n        \"patientID\": \"BOX00003977\",\n        \"dateOfBirth\": \"1981-12-25\",\n        \"startOfCareDate\": \"1981-12-25\",\n        \"middleName\": \"Edward\"\n      },\n      \"payerDetails\": {\n        \"memberId\": \"W9837639\"\n      },\n      \"gatewayName\": \"Inovalon\",\n      \"eligibilityRequestInitiationDate\": \"1981-12-25\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": \"401\",\n  \"message\": \"API key is missing or invalid\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3caa5142-7bc3-4158-9871-b4785dd0e29b",
+              "name": "Access forbidden. The API key is valid but does not have permission to access this resource.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "process-x12-eligibility-transaction"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"taskPayload\": {\n    \"transactionFiles\": {\n      \"requestFile\": {\n        \"uri\": {},\n        \"interchangeDate\": \"2021-12-19\",\n        \"interchangeTime\": \"string\",\n        \"interchangeTimezone\": \"string\"\n      },\n      \"responseFile\": {\n        \"uri\": {},\n        \"interchangeDate\": \"1980-04-18\",\n        \"interchangeTime\": \"string\",\n        \"interchangeTimezone\": \"string\"\n      }\n    },\n    \"meta\": {\n      \"senderDetails\": {\n        \"partnerName\": \"Wellsky\",\n        \"organizationName\": \"11111-Affinity\",\n        \"agencyName\": \"Polk\",\n        \"branchName\": \"Branch1\"\n      },\n      \"patientDetails\": {\n        \"firstName\": \"John\",\n        \"lastName\": \"Smith\",\n        \"patientID\": \"BOX00003977\",\n        \"dateOfBirth\": \"1981-12-25\",\n        \"startOfCareDate\": \"1981-12-25\",\n        \"middleName\": \"Edward\"\n      },\n      \"payerDetails\": {\n        \"memberId\": \"W9837639\"\n      },\n      \"gatewayName\": \"Inovalon\",\n      \"eligibilityRequestInitiationDate\": \"1981-12-25\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": \"403\",\n  \"message\": \"Access forbidden. The API key is valid but does not have permission to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "feac64a1-cc9b-4f93-b5f3-a1204ebb5dfc",
+          "name": "Process X12 Eligibility Transaction Status (Draft)",
+          "request": {
+            "name": "Process X12 Eligibility Transaction Status (Draft)",
+            "description": {
+              "content": "Fetch the current status of an Process X12 Eligibility Transaction. It takes the `taskId`, provided by the Process X12 Eligibility Transaction, as input.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "wf",
+                "v2",
+                "workflows",
+                "process-x12-eligibility-transaction",
+                ":task-id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "task-id",
+                  "description": "(Required) Provide a task id to retreive the Process X12 Eligibility Transaction status"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "X-API-Key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "c0369cc1-3527-400e-a0d0-0dff22ca6190",
+              "name": "Status of a Process X12 Eligibility Transaction",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "process-x12-eligibility-transaction",
+                    ":task-id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "task-id",
+                      "description": "(Required) Provide a task id to retreive the Process X12 Eligibility Transaction status"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"taskId\": \"55dfe5e9-725a-4ce0-ba41-925e588623c2\",\n  \"taskName\": \"process-x12-eligibility-transaction\",\n  \"createdAt\": \"2017-07-21T17:32:28Z\",\n  \"status\": \"processing\",\n  \"startedAt\": \"2017-07-21T17:32:28Z\",\n  \"attempt\": 1\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "25c7cfee-0aaf-41fc-a4fc-bf3067ae8841",
+              "name": "API key is missing or invalid",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "process-x12-eligibility-transaction",
+                    ":task-id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "task-id",
+                      "description": "(Required) Provide a task id to retreive the Process X12 Eligibility Transaction status"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": \"401\",\n  \"message\": \"API key is missing or invalid\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "61704118-1c89-4e1a-a493-bfd13b0a5e45",
+              "name": "Access forbidden. The API key is valid but does not have permission to access this resource.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "wf",
+                    "v2",
+                    "workflows",
+                    "process-x12-eligibility-transaction",
+                    ":task-id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "task-id",
+                      "description": "(Required) Provide a task id to retreive the Process X12 Eligibility Transaction status"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-API-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": \"403\",\n  \"message\": \"Access forbidden. The API key is valid but does not have permission to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api-qa.e5.ai",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "X-API-Key"
+      },
+      {
+        "key": "value",
+        "value": "{{apiKey}}"
+      },
+      {
+        "key": "in",
+        "value": "header"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "3603f179-bc12-41b9-9e2c-2afdbd3a8d4a",
+    "name": "Element5 Authorization Eligibility API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Element5 APIs enables the clients to invoke and monitor Element5 Workflows. The E5 APIs are protected by API keys and the keys would be shared during the onboarding process. Due to the long running nature of workflows the current state of the workflows can be tracked either by polling E5 APIs for status or exposing a webhook which will be notified about progress. The below sections highlight the APIs and events which would be relevant for the current engagement.\n\n# Authentication\n\n<!-- ReDoc-Inject: <security-definitions> -->\n\nContact Support:\n Email: apisupport@e5.ai",
+      "type": "text/plain"
+    }
+  }
+}
