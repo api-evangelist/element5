@@ -18,18 +18,19 @@ edges:
   capability_id: BC-2800.30
   capability_id_l1: BC-2800
   capability_name: Eligibility & Benefits Verification
-  confidence: 0.92
-  evidence: POST /wf/v2/workflows/submit-eligibility  Eligibility Submission Request; ProcessX12EligibilityTransactionAttachment270
-  reason: Operations submit and track insurance eligibility/benefit verification requests (X12 270/271),
-    which is Eligibility & Benefits Verification within Patient Access Management.
+  confidence: 0.88
+  evidence: POST /wf/v2/workflows/submit-eligibility 'Eligibility Submission Request'; 'Process X12 Eligibility
+    Transaction'; schema ProcessX12EligibilityTransactionAttachment270
+  reason: X12 270/271 eligibility transactions and eligibility submission workflows are exactly insurance
+    coverage and benefits verification prior to service delivery.
 - tag: Authorization
   spec_file: element5-authorization-api-openapi.yml
   capability_id: BC-2800.30
   capability_id_l1: BC-2800
   capability_name: Eligibility & Benefits Verification
-  confidence: 0.75
-  evidence: '"Authorization Submission Request", schema SubmitAuthorizationRequest; vendor automates "eligibility
-    and benefit verification, prior authorization submission"'
-  reason: Submitting and tracking payer prior-authorization requests falls under verification of coverage
-    and authorisation requirements before service delivery. Some chance the intended home is utilisation
-    management, hence 0.75.
+  confidence: 0.72
+  evidence: 'POST /wf/v2/workflows/submit-authorization ''Authorization Submission Request''; vendor:
+    "prior authorization submission"'
+  reason: Operations submit and track prior-authorisation requests to payers. In this frame, authorisation
+    requirements before service delivery sit under Eligibility & Benefits Verification. Some chance a
+    grader would place prior auth under revenue cycle instead, hence 0.72 rather than higher.
