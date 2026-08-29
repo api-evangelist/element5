@@ -1,0 +1,35 @@
+slug: element5
+provider: Element5
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Healthcare Providers
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 2
+edges:
+- tag: Eligibility
+  spec_file: element5-eligibility-api-openapi.yml
+  capability_id: BC-2800.30
+  capability_id_l1: BC-2800
+  capability_name: Eligibility & Benefits Verification
+  confidence: 0.92
+  evidence: POST /wf/v2/workflows/submit-eligibility  Eligibility Submission Request; ProcessX12EligibilityTransactionAttachment270
+  reason: Operations submit and track insurance eligibility/benefit verification requests (X12 270/271),
+    which is Eligibility & Benefits Verification within Patient Access Management.
+- tag: Authorization
+  spec_file: element5-authorization-api-openapi.yml
+  capability_id: BC-2800.30
+  capability_id_l1: BC-2800
+  capability_name: Eligibility & Benefits Verification
+  confidence: 0.75
+  evidence: '"Authorization Submission Request", schema SubmitAuthorizationRequest; vendor automates "eligibility
+    and benefit verification, prior authorization submission"'
+  reason: Submitting and tracking payer prior-authorization requests falls under verification of coverage
+    and authorisation requirements before service delivery. Some chance the intended home is utilisation
+    management, hence 0.75.

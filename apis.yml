@@ -120,6 +120,9 @@ apis:
   - type: OpenAPI
     url: openapi/element5-automation-api-openapi.yml
 common:
+- type: CapabilityMap
+  url: capabilities/element5-capability-edges.yml
+  name: Element5 Business Capability Map
 - type: AgenticAccess
   url: agentic-access/element5-agentic-access.yml
 - type: DomainSecurity
