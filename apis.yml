@@ -109,6 +109,16 @@ apis:
     url: https://api-doc.e5.ai/
   - type: APIReference
     url: https://api-doc.e5.ai/
+- aid: element5:element5-automation-api
+  name: Element5 Automation API
+  description: Generic E5 Task related APIs and Webhooks
+  humanURL: https://api-doc.e5.ai/
+  baseURL: https://api.e5.ai
+  tags:
+  - Automation
+  properties:
+  - type: OpenAPI
+    url: openapi/element5-automation-api-openapi.yml
 common:
 - type: AgenticAccess
   url: agentic-access/element5-agentic-access.yml

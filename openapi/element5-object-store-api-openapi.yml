@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Element5 Authorization Object Store API
+  title: Element5 Object Store API
   description: 'Element5 APIs enables the clients to invoke and monitor Element5 Workflows. The E5 APIs are protected by API keys and the keys would be shared during the onboarding process. Due to the long running nature of workflows the current state of the workflows can be tracked either by polling E5 APIs for status or exposing a webhook which will be notified about progress. The below sections highlight the APIs and events which would be relevant for the current engagement.
 
 
@@ -162,15 +162,6 @@ components:
       example:
         code: '413'
         message: Payload too large - file exceeds maximum size
-    AuthorizationError:
-      type: object
-      properties:
-        code:
-          type: string
-          example: '403'
-        message:
-          type: string
-          example: Access forbidden. The API key is valid but does not have permission to access this resource.
     FileUploadBadRequestError:
       type: object
       description: File upload Bad Request Error Response
@@ -186,6 +177,24 @@ components:
       example:
         code: '400'
         message: Bad request - the uploaded file is invalid or missing required data
+    AuthError:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '401'
+        message:
+          type: string
+          example: API key is missing or invalid
+    AuthorizationError:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '403'
+        message:
+          type: string
+          example: Access forbidden. The API key is valid but does not have permission to access this resource.
     FileUploadSuccessResponse:
       type: object
       description: File upload Success Response
@@ -199,15 +208,6 @@ components:
           type: string
           description: Unique URL to access the uploaded file
           example: https://blob.e5.ai/store/v1/file-object/550e8400-e29b-41d4-a716-446655440000
-    AuthError:
-      type: object
-      properties:
-        code:
-          type: string
-          example: '401'
-        message:
-          type: string
-          example: API key is missing or invalid
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

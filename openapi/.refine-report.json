@@ -1,18 +1,24 @@
 {
   "provider": "element5",
   "sources": [
-    "element5-authorization-api-openapi.yml",
-    "element5-eligibility-api-openapi.yml",
-    "element5-object-store-api-openapi.yml"
+    "_original/element5-openapi-original.json"
   ],
   "outputs": [
     "element5-authorization-api-openapi.yml",
+    "element5-automation-api-openapi.yml",
     "element5-eligibility-api-openapi.yml",
     "element5-object-store-api-openapi.yml"
   ],
   "archived": [],
   "errors": [],
   "warnings": [],
-  "notes": [],
-  "skipped": []
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "element5-openapi-original.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0"
+  ],
+  "skipped": [
+    "element5-authorization-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "element5-eligibility-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "element5-object-store-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

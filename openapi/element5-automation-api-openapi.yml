@@ -1,0 +1,1004 @@
+openapi: 3.2.0
+info:
+  title: Element5 Automation API
+  description: 'Element5 APIs enables the clients to invoke and monitor Element5 Workflows. The E5 APIs are protected by API keys and the keys would be shared during the onboarding process. Due to the long running nature of workflows the current state of the workflows can be tracked either by polling E5 APIs for status or exposing a webhook which will be notified about progress. The below sections highlight the APIs and events which would be relevant for the current engagement.
+
+
+    # Authentication
+
+
+    <!-- ReDoc-Inject: <security-definitions> -->'
+  contact:
+    email: apisupport@e5.ai
+  version: 2.2.0
+  x-logo:
+    url: https://cdn.prod.website-files.com/658c60c4ff902effa2174f77/668c43e2bfb9956a2995b419_e5-logo-gradient.png
+    altText: Element5
+    href: https://e5.ai
+servers:
+- url: https://api-qa.e5.ai
+  description: Non-Production Server
+- url: https://api.e5.ai
+  description: Production Server
+security:
+- ApiKeyAuth: []
+tags:
+- name: Automation
+  description: Generic E5 Task related APIs and Webhooks
+paths: {}
+webhooks:
+  E5TaskEvents:
+    post:
+      tags:
+      - Automation
+      operationId: E5TaskEvent
+      description: Due to the long running nature of workflows, Element5 has a webhook interface which sends out events at important junctures when a request is processed. The events would be posted to the Webhook URL which would be configured as part of the onboarding process. **Assumption:** The URLs and their access credentials would have been already shared to Element5 as part of the onboarding process.
+      summary: Task Events (Callbacks)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Element5WebhookRequest'
+        required: true
+      responses:
+        '200':
+          description: Event delivered successfully
+        4XX:
+          description: Unable to deliver the event
+        5XX:
+          description: Unable to deliver the event
+components:
+  schemas:
+    TaskStarted:
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Processing'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+          example: 1
+    TaskStatus_Queued:
+      type: string
+      enum:
+      - queued
+    TaskQueued:
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Queued'
+    TaskFailures:
+      oneOf:
+      - $ref: '#/components/schemas/AuthorizationTaskFailures'
+      - $ref: '#/components/schemas/EligibilityTaskFailures'
+      discriminator:
+        propertyName: taskName
+        mapping:
+          submit-authorization: '#/components/schemas/AuthorizationTaskFailures'
+          submit-eligibility: '#/components/schemas/EligibilityTaskFailures'
+    TaskRestarted:
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Processing'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+    TaskStatus_Failed:
+      type: string
+      enum:
+      - failed
+    SubmitEligibilityFailure_submitEligibility:
+      type: object
+      properties:
+        failureReason:
+          type: string
+    TaskSucceeded:
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Success'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        endedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+        taskPayload:
+          $ref: '#/components/schemas/TaskSuccesses'
+    SubmitEligibilityFailure:
+      type: object
+      properties:
+        submitEligibility:
+          $ref: '#/components/schemas/SubmitEligibilityFailure_submitEligibility'
+    DateString:
+      type: string
+      description: Date and time in ISO8601 format
+      format: date-time
+      example: '2017-07-21T17:32:28Z'
+    SubmitAuthorizationFailure_submitAuthorization:
+      type: object
+      properties:
+        failureReason:
+          type: string
+    SubmitEligibilityProgress_submitEligibility:
+      type: object
+      properties:
+        progress:
+          type: string
+    EligibilityResponse:
+      type: object
+      properties:
+        patientDetails:
+          type: object
+          description: Patient details from the payer's eligibility record
+          properties:
+            patientId:
+              type: string
+              description: 'Patient Unique ID - Eg: Medical Record number'
+            firstName:
+              type: string
+              description: Patient's first name
+            lastName:
+              type: string
+              description: Patient's last name
+            middleName:
+              type: string
+              description: Patient's middle name
+            dateOfBirth:
+              type: string
+              format: date
+              description: Patient's date of birth. Date in ISO8601 format
+            gender:
+              type: string
+              description: Gender of the patient from the payer's eligibility record
+            patientAddress:
+              type: object
+              description: Patient's address
+              properties:
+                addressLine1:
+                  type: string
+                  description: Patient's address line 1
+                addressLine2:
+                  type: string
+                  description: Patient's address line 2
+                city:
+                  type: string
+                  description: Patient's city
+                state:
+                  type: string
+                  description: Patient's state
+                zip:
+                  type: string
+                  description: Patient's zip
+            relationshipToSubscriber:
+              type: string
+              description: Patient Relationship to Subscriber
+          required:
+          - patientId
+          - firstName
+          - lastName
+        subscriberDetails:
+          type: object
+          description: Subscriber details from the payer's eligibility record
+          properties:
+            firstName:
+              type: string
+              description: Subscriber's first name
+            lastName:
+              type: string
+              description: Subscriber's last name
+            middleName:
+              type: string
+              description: Subscriber's middle name
+            dateOfBirth:
+              type: string
+              format: date
+              description: Subscriber's date of birth. Date in ISO8601 format
+            gender:
+              type: string
+              description: Gender of the Subscriber from the payer's eligibility record
+            subscriberAddress:
+              type: object
+              description: Subscriber's address
+              properties:
+                addressLine1:
+                  type: string
+                  description: Subscriber's address line 1
+                addressLine2:
+                  type: string
+                  description: Subscriber's address line 2
+                city:
+                  type: string
+                  description: Subscriber's city
+                state:
+                  type: string
+                  description: Subscriber's state
+                zip:
+                  type: string
+                  description: Subscriber's zip
+          required: []
+        payerDetails:
+          type: object
+          description: Payer details from the payer's eligibility record
+          properties:
+            payerName:
+              type: string
+              description: Name of the Payer
+            planName:
+              type: string
+              description: Name of the insurance plan
+            payerType:
+              type: string
+              description: Type of payer (e.g., Medicare, Medicaid, Medicare Advantage)
+            payerId:
+              type: string
+              description: Electronic 5-digit ID used for payer transactions
+            memberId:
+              type: string
+              description: Member identification number returned from the payer
+            MBI:
+              type: string
+              description: Medicare Beneficiary Identifier assigned by CMS
+            medicaidID:
+              type: string
+              description: Medicaid ID, if applicable
+            gateway:
+              type: string
+              description: Clearinghouse/Payor where eligibility was checked (e.g., Availity, Waystar. UHC).
+          required:
+          - gateway
+        planDetails:
+          type: object
+          description: Plan details from the payer's eligibility record
+          properties:
+            planNumber:
+              type: string
+              description: Unique identifier assigned to the member's insurance plan
+            planSponsor:
+              type: string
+              description: Organization or employer that offers or funds the health insurance plan.
+            groupName:
+              type: string
+              description: Name of the employer or group associated with the insurance coverage.
+            groupNumber:
+              type: string
+              description: Identifier used to group members under the same employer or plan contract.
+            planType:
+              type: string
+              description: Type of health plan (e.g., HMO, PPO)
+              example: HMO
+            planAuthorizationRequired:
+              type: string
+              description: Indicates whether prior authorization is required for services under the plan.
+            utilizationManagementOrganization:
+              type: string
+              description: Utilization Management Organization info
+            CMSContractNumber:
+              type: string
+              description: CMS-issued contract number for the Medicare plan
+          required: []
+        planCoverage:
+          type: object
+          description: Plan coverage details from the payer's eligibility record
+          properties:
+            eligibilityCheckDate:
+              type: string
+              format: date
+              description: Eligibility check date
+              example: '1945-01-15'
+            EligibilityInquiryId:
+              type: string
+              description: Reference number for the eligibility inquiry from CH/Payer
+            coverageStatus:
+              type: string
+              description: Indicates whether the policy is active or inactive
+            coverageDescription:
+              type: string
+              description: Coverage description from the payer
+            policyStartDate:
+              type: string
+              description: Policy Start Date. Date in ISO8601 format
+              format: date
+              example: '1945-01-15'
+            policyEndDate:
+              type: string
+              description: Policy End Date. Date in ISO8601 format
+              format: date
+              example: '1945-01-15'
+            referralStatus:
+              type: string
+              description: Indicates if referrals are required under the plan
+            serviceCareProviderNetworkStatus:
+              type: string
+              description: Service Care Provider Network Status
+              example:
+              - In-Network
+              - Out-of-Network
+          required:
+          - eligibilityCheckDate
+        planBenefits:
+          type: array
+          description: Plan benefits and plan level accumulator info
+          items:
+            type: object
+            properties:
+              network:
+                type: string
+                enum:
+                - In-Network
+                - Out-of-Network
+                - General
+              coverageLevel:
+                type: string
+                description: 'Coverage level of the benefits. Eg: ''Individual'', ''Family'', ''Employee Only'''
+                example:
+                - Individual
+                - Family
+                - Employee Only
+              benefitStartDate:
+                type: string
+                description: Benefit Start Date. Date in ISO8601 format
+                format: date
+                example: '1945-01-15'
+              benefitEndDate:
+                type: string
+                description: Benefit End Date. Date in ISO8601 format
+                format: date
+                example: '1945-01-15'
+              deductible:
+                type: array
+                description: Deductible details
+                items:
+                  type: object
+                  properties:
+                    deductibleAmount:
+                      type: string
+                      description: Total deductible amount
+                    deductibleUsed:
+                      type: string
+                      description: Used deductible amount
+                    deductibleRemaining:
+                      type: string
+                      description: Remaining deductible amount
+                    deductiblePayerNotes:
+                      type: string
+                      description: Deductible payer notes
+              outOfPocket:
+                type: array
+                description: Out Of Pocket Maximum Details
+                items:
+                  type: object
+                  properties:
+                    outOfPocketMaximum:
+                      type: string
+                      description: Out of pocket maxiumum amount
+                    outOfPocketUsed:
+                      type: string
+                      description: Out of pocket amount used
+                    outOfPocketRemaining:
+                      type: string
+                      description: Out of pocket amount remaining
+                    outOfPocketPayerNotes:
+                      type: string
+                      description: Out of pocket Payer notes
+            required: []
+        serviceLevelDetails:
+          type: array
+          description: Service level details from the payer's eligibility record
+          items:
+            type: object
+            properties:
+              serviceTypeCode:
+                type: string
+                description: Code representing the type of service (e.g., 42 for Home Health)
+              serviceTypeDescription:
+                type: string
+                description: Description of the service associated with the code
+              coverageStatus:
+                type: string
+                description: Coverage status for the service type
+              coverageDescription:
+                type: string
+                description: Coverage description from the payer
+              benefitStartDate:
+                type: string
+                description: Benefit Start Date. Date in ISO8601 format
+                format: date
+                example: '1945-01-15'
+              benefitEndDate:
+                type: string
+                description: Benefit End Date. Date in ISO8601 format
+                format: date
+                example: '1945-01-15'
+              serviceLevelBenefits:
+                type: array
+                description: Plan benefits and plan level accumulator info
+                items:
+                  type: object
+                  properties:
+                    network:
+                      type: string
+                      enum:
+                      - In-Network
+                      - Out-of-Network
+                      - General
+                    coverageLevel:
+                      type: string
+                      description: 'Coverage level of the benefits. Eg: ''Individual'', ''Family'', ''Employee Only'''
+                      example:
+                      - Individual
+                      - Family
+                      - Employee Only
+                    coPayment:
+                      type: array
+                      description: Co-payment details for the service type.
+                      items:
+                        type: object
+                        properties:
+                          coPayAmount:
+                            type: string
+                            description: Co-Pay amount
+                          coPayPayerNotes:
+                            type: string
+                            description: Co-Pay Payer Notes
+                          authRequired:
+                            type: string
+                            description: Indicates if authorization is needed for the specified benefit.
+                    coInsurance:
+                      type: array
+                      description: Co-Insurance details for the service type.
+                      items:
+                        type: object
+                        properties:
+                          coInsurancepercent:
+                            type: string
+                            description: Co-Insurance % for  service type.
+                          coInsurancePayerNotes:
+                            type: string
+                            description: Co-Insurance Payer Notes
+                          authRequired:
+                            type: string
+                            description: Indicates if authorization is needed for the specified benefit.
+                    deductible:
+                      type: array
+                      description: Deductible requirements for service type.
+                      items:
+                        type: object
+                        properties:
+                          deductibleAmount:
+                            type: string
+                            description: Total deductible amount
+                          deductibleUsed:
+                            type: string
+                            description: Used deductible amount
+                          deductibleRemaining:
+                            type: string
+                            description: Remaining deductible amount
+                          deductiblePayerNotes:
+                            type: string
+                            description: Deductible payer notes
+                    visitLimitsAndDisciplineExclusionsDetails:
+                      type: array
+                      description: Visit Limits And Discipline Exclusions details for the service type.
+                      items:
+                        type: object
+                        properties:
+                          visitLimitsAndDisciplineExclusions:
+                            type: string
+                            description: Limits and exclusions for the service type.
+                          visitLimitsAndExclusionsPayerNotes:
+                            type: string
+                            description: Visit limits and Exclusions Payer Notes
+                          authRequired:
+                            type: string
+                            description: Indicates if authorization is needed for the specified benefit.
+                required: []
+        memberIdCard:
+          type: object
+          description: Member ID card details from the payer's eligibility record
+          properties:
+            payerId:
+              type: string
+              description: 5-digit payer ID from the insurance ID card
+            providerPhoneNumber:
+              type: string
+              description: Customer or provider service number listed on the card
+            medicareNationalNetworkStatus:
+              type: string
+              description: Network status specific to Medicare plans shown on the card
+            levelFundedPlan:
+              type: boolean
+              description: Level funded plan identified on the ID card
+          required: []
+        additionalCoverageDetails:
+          type: array
+          description: Additional coverage details from the payer's eligibility record
+          items:
+            type: object
+            properties:
+              planName:
+                type: string
+                description: Name of the additional or secondary insurance plan
+              payerId:
+                type: string
+                description: Payer ID of the secondary insurance
+              coverageStartDate:
+                type: string
+                description: Start date for additional coverage . Date in ISO8601 format
+                example: '2024-06-15'
+              coverageEndDate:
+                type: string
+                description: End date for additional coverage. Date in ISO8601 format
+                example: '2025-06-14'
+              memberId:
+                type: string
+                description: Member identification number returned from the payer
+            required: []
+        primaryCareProviderDetails:
+          type: array
+          description: Primary care provider details from the payer's eligibility record
+          items:
+            type: object
+            properties:
+              pcpFirstName:
+                type: string
+                description: First name of the primary care provider (PCP)
+              pcpLastName:
+                type: string
+                description: Last name of the primary care provider (PCP)
+              pcpContactNumber:
+                type: string
+                description: Contact number for the PCP
+              pcpAddress:
+                type: object
+                description: Address of the PCP
+                properties:
+                  addressLine1:
+                    type: string
+                    description: Address line 1
+                  addressLine2:
+                    type: string
+                    description: Address line 2
+                  city:
+                    type: string
+                    description: City
+                  state:
+                    type: string
+                    description: State
+                  zip:
+                    type: string
+                    description: Zip
+              pcpType:
+                type: string
+                description: Type of PCP
+              pcpNPI:
+                type: string
+                description: National Provider Identifier for the PCP
+              pcpGroupNumber:
+                type: string
+                description: National Provider group number
+          required: []
+        contractedServiceProvider:
+          type: object
+          description: Contracted service provider details from the payer's eligibility record
+          properties:
+            contractedServiceProviderName:
+              type: string
+              description: Contracted Service Provider Name
+            contractedServiceProviderAddress:
+              type: object
+              description: Contracted Service Provider address
+              properties:
+                addressLine1:
+                  type: string
+                  description: Address line 1
+                addressLine2:
+                  type: string
+                  description: Address line 2
+                city:
+                  type: string
+                  description: City
+                state:
+                  type: string
+                  description: State
+                zip:
+                  type: string
+                  description: Zip
+          required: []
+        eligibilityAlert:
+          type: array
+          description: Eligibility alert details from the payer's eligibility record
+          items:
+            type: object
+            properties:
+              eligibilityAlertType:
+                type: string
+                description: 'Alert type category - Eg: Patient data mismatch'
+              alertDescription:
+                type: string
+                description: Payer/Clearing house alerts for the Eligibility transaction
+            required: []
+      required:
+      - patientDetails
+    TaskName:
+      type: string
+      enum:
+      - submit-authorization
+      - submit-eligibility
+    EligibilityTaskFailures:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitEligibilityFailure'
+    TaskFailed:
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Failed'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        endedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+        taskPayload:
+          $ref: '#/components/schemas/TaskFailures'
+    SubmitEligibilityProgress:
+      type: object
+      properties:
+        submitEligibility:
+          $ref: '#/components/schemas/SubmitEligibilityProgress_submitEligibility'
+    EligibilityTaskProgresses:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitEligibilityProgress'
+    SubmitEligibilitySuccessResponse:
+      type: object
+      properties:
+        eligibilityResponse:
+          $ref: '#/components/schemas/EligibilityResponse'
+        eligibilityResponseDocs:
+          type: array
+          description: Documents which are received as part of the Eligibility Response
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+                description: 'URL pointing to a file in Element5''s object store. '
+              documentType:
+                type: string
+                description: 'Type of the docuement. Like PDF of eligibility info from payer, PDF of member ID card if available from payer, etc. '
+                example: Eligibility PDF
+    Element5Events:
+      type: string
+      enum:
+      - task#queued
+      - task#started
+      - task#restarted
+      - task#progressed
+      - task#succeeded
+      - task#failed
+    TaskStatus_Success:
+      type: string
+      enum:
+      - success
+    SubmitAuthorizationSuccess:
+      type: object
+      properties:
+        submitAuthorization:
+          $ref: '#/components/schemas/SubmitAuthorizationSuccessResponse'
+    SubmitAuthorizationFailure:
+      type: object
+      properties:
+        submitAuthorization:
+          $ref: '#/components/schemas/SubmitAuthorizationFailure_submitAuthorization'
+    AuthorizationTaskSuccesses:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitAuthorizationSuccess'
+    TaskID:
+      type: string
+      format: uuid
+      example: 55dfe5e9-725a-4ce0-ba41-925e588623c2
+    TaskStatus_Processing:
+      type: string
+      enum:
+      - processing
+    SubmitAuthorizationSuccessResponse:
+      type: object
+      properties:
+        authResponse:
+          $ref: '#/components/schemas/AuthResponse'
+    SubmitAuthorizationProgress:
+      type: object
+      properties:
+        submitAuthorization:
+          $ref: '#/components/schemas/SubmitAuthorizationProgress_submitAuthorization'
+    TaskEvents:
+      type: object
+      properties:
+        task:
+          oneOf:
+          - $ref: '#/components/schemas/TaskQueued'
+          - $ref: '#/components/schemas/TaskStarted'
+          - $ref: '#/components/schemas/TaskRestarted'
+          - $ref: '#/components/schemas/TaskProgressed'
+          - $ref: '#/components/schemas/TaskSucceeded'
+          - $ref: '#/components/schemas/TaskFailed'
+    TaskSuccesses:
+      oneOf:
+      - $ref: '#/components/schemas/AuthorizationTaskSuccesses'
+      - $ref: '#/components/schemas/EligibilityTaskSuccesses'
+      discriminator:
+        propertyName: taskName
+        mapping:
+          submit-authorization: '#/components/schemas/AuthorizationTaskSuccesses'
+          submit-eligibility: '#/components/schemas/EligibilityTaskSuccesses'
+    EligibilityTaskSuccesses:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitEligibilitySuccessResponse'
+    TaskProgressed:
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Processing'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+        taskPayload:
+          $ref: '#/components/schemas/TaskProgresses'
+    Element5WebhookRequest:
+      type: object
+      properties:
+        eventName:
+          $ref: '#/components/schemas/Element5Events'
+        eventId:
+          type: string
+          format: uuid
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        eventPayload:
+          oneOf:
+          - $ref: '#/components/schemas/TaskEvents'
+    AuthorizationTaskProgresses:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitAuthorizationProgress'
+    SubmitAuthorizationProgress_submitAuthorization:
+      type: object
+      properties:
+        progress:
+          type: string
+    AuthorizationTaskFailures:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitAuthorizationFailure'
+    AuthResponse:
+      type: object
+      properties:
+        patientDetails:
+          type: object
+          description: Patient Details
+          properties:
+            firstName:
+              type: string
+              description: Patient first name
+              maxLength: 50
+              minLength: 1
+              example: John
+            lastName:
+              type: string
+              description: Patient last name
+              maxLength: 50
+              minLength: 1
+              example: Smith
+            middleName:
+              type: string
+              description: Patient middle name
+              example: Edward
+            patientId:
+              type: string
+              description: 'Patient Unique ID - Eg: Medical Record number'
+              example: BOX00003977
+          required:
+          - firstName
+          - lastName
+          - patientId
+        payerDetails:
+          type: object
+          description: Payer Details
+          properties:
+            memberId:
+              type: string
+              description: Member identification number/payer policy number
+              example: W9837639
+            payerPlanName:
+              type: string
+              description: Payer Plan name of the patient
+              example: AARP® Medicare Advantage from UnitedHealthcare
+            gateway:
+              type: string
+              description: Gateway in which the authorization was submitted
+              example: UHC
+          required:
+          - memberId
+          - payerPlanName
+          - gateway
+        authorizationResponse:
+          description: Authorization Response Details
+          type: object
+          properties:
+            authNumber:
+              type: string
+              description: Authorization number returned from the payer after the request is placed
+            authStatus:
+              type: string
+              description: Status of the overall authorization request
+              enum:
+              - PENDING
+              - APPROVED
+              - DENIED
+              - PARTIALLY APPROVED
+              - EXCEPTION
+              example: PENDING
+            lastStatusCheck:
+              type: string
+              format: date
+              description: Timestamp of the last attempt to submit or check the authorization in the portal. Date in ISO8601 format (YYYY-MM-DD)
+              example: '2025-05-26'
+            payerResponseDate:
+              type: string
+              format: date
+              description: Date in which the payer gave a response of the request that is no longer pending. Date in ISO8601 format (YYYY-MM-DD)
+              example: '2025-07-30'
+            services:
+              type: array
+              description: Discipline level Auth response details
+              items:
+                type: object
+                properties:
+                  serviceDiscipline:
+                    type: string
+                    description: Discipline requested
+                    enum:
+                    - SN
+                    - PT
+                    - OT
+                    - MSW
+                    - HHA
+                    - ST
+                    - LPN
+                    example: SN
+                  disciplineAuthStatus:
+                    type: string
+                    description: Auth status of the unique requested discipline
+                    enum:
+                    - PENDING
+                    - APPROVED
+                    - DENIED
+                    - PARTIALLY APPROVED
+                    - EXCEPTION
+                    example: PENDING
+                  disciplineAuthNumber:
+                    type: string
+                    description: Authorization Number associated with the unique discipline for the authorization request
+                    example: A2344222333
+                  requestedUnits:
+                    type: integer
+                    description: Total qty requested for the unique discipline
+                    example: 10
+                  approvedUnits:
+                    type: integer
+                    description: Total visits approved for the unique discipline
+                    example: 5
+                  deniedUnits:
+                    type: integer
+                    description: Total visits denied for the unique discipline
+                    example: 3
+                  pendingUnits:
+                    type: integer
+                    description: Total visits pending for the unique discipline
+                    example: 2
+                  authStartDate:
+                    type: string
+                    format: date
+                    description: Authorization start date for the discipline - requested start date/approved start date. Date in ISO8601 format (YYYY-MM-DD)
+                    example: '2025-05-26'
+                  authEndDate:
+                    type: string
+                    format: date
+                    description: Authorization end date for the discipline - requested end date/approved end date. Date in ISO8601 format (YYYY-MM-DD)
+                    example: '2025-07-30'
+                  denialReason:
+                    type: string
+                    description: Reason provided for denial, if applicable
+            authResponseDocs:
+              type: array
+              description: Documents which are received as part of the Authorization Response
+              items:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    description: URL of a file which would be attached submitted as part of authorization request. Need creds for accessing SFTP (userID/pwd or token). Whitelisting will also be needed.
+                  attachmentType:
+                    type: string
+                    description: Type of the attachment
+                  attachmentName:
+                    type: string
+                    description: Name of the attachment
+            authExceptions:
+              type: string
+              description: Exceptions encountered during auth submission or retrieval process
+          required:
+          - authStatus
+      required:
+      - patientDetails
+      - payerDetails
+      - authorizationResponse
+    TaskProgresses:
+      oneOf:
+      - $ref: '#/components/schemas/AuthorizationTaskProgresses'
+      - $ref: '#/components/schemas/EligibilityTaskProgresses'
+      discriminator:
+        propertyName: taskName
+        mapping:
+          submit-authorization: '#/components/schemas/AuthorizationTaskProgresses'
+          submit-eligibility: '#/components/schemas/EligibilityTaskProgresses'
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      description: API key provided by Element5 to authenticate and authorize the Element5 APIs
+      name: X-API-Key
+      in: header
+x-tagGroups:
+- name: Core
+  tags:
+  - Automation
+  - Object Store
+- name: Micro Verticals
+  tags:
+  - Authorization
+  - Eligibility
