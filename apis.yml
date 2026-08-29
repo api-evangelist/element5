@@ -9,6 +9,18 @@ description: 'Element5 is a post-acute healthcare workflow automation platform t
   authorization and eligibility requests, process X12 270/271 eligibility transactions, upload and fetch
   file objects, and monitor long-running tasks via polling or webhook callbacks. The company is backed
   by Insight Partners and serves the post-acute care sector.'
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: unknown
   onboarding: self-serve
