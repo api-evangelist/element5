@@ -4,8 +4,8 @@ info:
   version: 1.0.0
   description: Submit an eligibility request and poll until the task succeeds or fails.
 sourceDescriptions:
-- name: element5
-  url: ../openapi/element5-openapi-original.json
+- name: eligibilityApi
+  url: ../openapi/element5-eligibility-api-openapi.yml
   type: openapi
 workflows:
 - workflowId: verifyEligibility

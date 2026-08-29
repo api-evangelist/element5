@@ -4,8 +4,11 @@ info:
   version: 1.0.0
   description: Upload a supporting file object, submit a prior-authorization request, then poll status.
 sourceDescriptions:
-- name: element5
-  url: ../openapi/element5-openapi-original.json
+- name: authorizationApi
+  url: ../openapi/element5-authorization-api-openapi.yml
+  type: openapi
+- name: objectStoreApi
+  url: ../openapi/element5-object-store-api-openapi.yml
   type: openapi
 workflows:
 - workflowId: submitAuthorization
