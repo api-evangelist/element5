@@ -7,7 +7,7 @@ info:
     # Authentication
 
 
-    <!-- ReDoc-Inject: <security-definitions> -->'
+    -->'
   contact:
     email: apisupport@e5.ai
   version: 2.2.0
@@ -147,21 +147,15 @@ paths:
       - BearerAuth: []
 components:
   schemas:
-    FileUploadPayloadTooLargeError:
+    AuthError:
       type: object
-      description: File upload Payload Too Large Error Response
       properties:
         code:
           type: string
-          description: Error code
-          example: '413'
+          example: '401'
         message:
           type: string
-          description: Error message
-          example: Payload too large - file exceeds maximum size
-      example:
-        code: '413'
-        message: Payload too large - file exceeds maximum size
+          example: API key is missing or invalid
     FileUploadBadRequestError:
       type: object
       description: File upload Bad Request Error Response
@@ -177,15 +171,6 @@ components:
       example:
         code: '400'
         message: Bad request - the uploaded file is invalid or missing required data
-    AuthError:
-      type: object
-      properties:
-        code:
-          type: string
-          example: '401'
-        message:
-          type: string
-          example: API key is missing or invalid
     AuthorizationError:
       type: object
       properties:
@@ -195,6 +180,21 @@ components:
         message:
           type: string
           example: Access forbidden. The API key is valid but does not have permission to access this resource.
+    FileUploadPayloadTooLargeError:
+      type: object
+      description: File upload Payload Too Large Error Response
+      properties:
+        code:
+          type: string
+          description: Error code
+          example: '413'
+        message:
+          type: string
+          description: Error message
+          example: Payload too large - file exceeds maximum size
+      example:
+        code: '413'
+        message: Payload too large - file exceeds maximum size
     FileUploadSuccessResponse:
       type: object
       description: File upload Success Response

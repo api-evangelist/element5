@@ -7,7 +7,7 @@ info:
     # Authentication
 
 
-    <!-- ReDoc-Inject: <security-definitions> -->'
+    -->'
   contact:
     email: apisupport@e5.ai
   version: 2.2.0
@@ -49,7 +49,36 @@ webhooks:
           description: Unable to deliver the event
 components:
   schemas:
-    TaskStarted:
+    TaskEvents:
+      type: object
+      properties:
+        task:
+          oneOf:
+          - $ref: '#/components/schemas/TaskQueued'
+          - $ref: '#/components/schemas/TaskStarted'
+          - $ref: '#/components/schemas/TaskRestarted'
+          - $ref: '#/components/schemas/TaskProgressed'
+          - $ref: '#/components/schemas/TaskSucceeded'
+          - $ref: '#/components/schemas/TaskFailed'
+    TaskID:
+      type: string
+      format: uuid
+      example: 55dfe5e9-725a-4ce0-ba41-925e588623c2
+    SubmitEligibilityFailure:
+      type: object
+      properties:
+        submitEligibility:
+          $ref: '#/components/schemas/SubmitEligibilityFailure_submitEligibility'
+    SubmitAuthorizationProgress:
+      type: object
+      properties:
+        submitAuthorization:
+          $ref: '#/components/schemas/SubmitAuthorizationProgress_submitAuthorization'
+    TaskStatus_Failed:
+      type: string
+      enum:
+      - failed
+    TaskFailed:
       type: object
       properties:
         taskId:
@@ -59,28 +88,30 @@ components:
         createdAt:
           $ref: '#/components/schemas/DateString'
         status:
-          $ref: '#/components/schemas/TaskStatus_Processing'
+          $ref: '#/components/schemas/TaskStatus_Failed'
         startedAt:
+          $ref: '#/components/schemas/DateString'
+        endedAt:
           $ref: '#/components/schemas/DateString'
         attempt:
           minimum: 1
           type: integer
-          example: 1
-    TaskStatus_Queued:
+        taskPayload:
+          $ref: '#/components/schemas/TaskFailures'
+    TaskName:
       type: string
       enum:
-      - queued
-    TaskQueued:
-      type: object
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Queued'
+      - submit-authorization
+      - submit-eligibility
+    Element5Events:
+      type: string
+      enum:
+      - task#queued
+      - task#started
+      - task#restarted
+      - task#progressed
+      - task#succeeded
+      - task#failed
     TaskFailures:
       oneOf:
       - $ref: '#/components/schemas/AuthorizationTaskFailures'
@@ -90,71 +121,228 @@ components:
         mapping:
           submit-authorization: '#/components/schemas/AuthorizationTaskFailures'
           submit-eligibility: '#/components/schemas/EligibilityTaskFailures'
-    TaskRestarted:
-      type: object
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Processing'
-        startedAt:
-          $ref: '#/components/schemas/DateString'
-        attempt:
-          minimum: 1
-          type: integer
-    TaskStatus_Failed:
-      type: string
-      enum:
-      - failed
-    SubmitEligibilityFailure_submitEligibility:
-      type: object
-      properties:
-        failureReason:
-          type: string
-    TaskSucceeded:
-      type: object
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Success'
-        startedAt:
-          $ref: '#/components/schemas/DateString'
-        endedAt:
-          $ref: '#/components/schemas/DateString'
-        attempt:
-          minimum: 1
-          type: integer
-        taskPayload:
-          $ref: '#/components/schemas/TaskSuccesses'
-    SubmitEligibilityFailure:
-      type: object
-      properties:
-        submitEligibility:
-          $ref: '#/components/schemas/SubmitEligibilityFailure_submitEligibility'
+    TaskProgresses:
+      oneOf:
+      - $ref: '#/components/schemas/AuthorizationTaskProgresses'
+      - $ref: '#/components/schemas/EligibilityTaskProgresses'
+      discriminator:
+        propertyName: taskName
+        mapping:
+          submit-authorization: '#/components/schemas/AuthorizationTaskProgresses'
+          submit-eligibility: '#/components/schemas/EligibilityTaskProgresses'
     DateString:
       type: string
       description: Date and time in ISO8601 format
       format: date-time
       example: '2017-07-21T17:32:28Z'
-    SubmitAuthorizationFailure_submitAuthorization:
+    SubmitAuthorizationFailure:
       type: object
       properties:
-        failureReason:
-          type: string
-    SubmitEligibilityProgress_submitEligibility:
+        submitAuthorization:
+          $ref: '#/components/schemas/SubmitAuthorizationFailure_submitAuthorization'
+    TaskStatus_Processing:
+      type: string
+      enum:
+      - processing
+    TaskStatus_Queued:
+      type: string
+      enum:
+      - queued
+    TaskSuccesses:
+      oneOf:
+      - $ref: '#/components/schemas/AuthorizationTaskSuccesses'
+      - $ref: '#/components/schemas/EligibilityTaskSuccesses'
+      discriminator:
+        propertyName: taskName
+        mapping:
+          submit-authorization: '#/components/schemas/AuthorizationTaskSuccesses'
+          submit-eligibility: '#/components/schemas/EligibilityTaskSuccesses'
+    EligibilityTaskFailures:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitEligibilityFailure'
+    AuthResponse:
       type: object
       properties:
-        progress:
-          type: string
+        patientDetails:
+          type: object
+          description: Patient Details
+          properties:
+            firstName:
+              type: string
+              description: Patient first name
+              maxLength: 50
+              minLength: 1
+              example: John
+            lastName:
+              type: string
+              description: Patient last name
+              maxLength: 50
+              minLength: 1
+              example: Smith
+            middleName:
+              type: string
+              description: Patient middle name
+              example: Edward
+            patientId:
+              type: string
+              description: 'Patient Unique ID - Eg: Medical Record number'
+              example: BOX00003977
+          required:
+          - firstName
+          - lastName
+          - patientId
+        payerDetails:
+          type: object
+          description: Payer Details
+          properties:
+            memberId:
+              type: string
+              description: Member identification number/payer policy number
+              example: W9837639
+            payerPlanName:
+              type: string
+              description: Payer Plan name of the patient
+              example: AARP® Medicare Advantage from UnitedHealthcare
+            gateway:
+              type: string
+              description: Gateway in which the authorization was submitted
+              example: UHC
+          required:
+          - memberId
+          - payerPlanName
+          - gateway
+        authorizationResponse:
+          description: Authorization Response Details
+          type: object
+          properties:
+            authNumber:
+              type: string
+              description: Authorization number returned from the payer after the request is placed
+            authStatus:
+              type: string
+              description: Status of the overall authorization request
+              enum:
+              - PENDING
+              - APPROVED
+              - DENIED
+              - PARTIALLY APPROVED
+              - EXCEPTION
+              example: PENDING
+            lastStatusCheck:
+              type: string
+              format: date
+              description: Timestamp of the last attempt to submit or check the authorization in the portal. Date in ISO8601 format (YYYY-MM-DD)
+              example: '2025-05-26'
+            payerResponseDate:
+              type: string
+              format: date
+              description: Date in which the payer gave a response of the request that is no longer pending. Date in ISO8601 format (YYYY-MM-DD)
+              example: '2025-07-30'
+            services:
+              type: array
+              description: Discipline level Auth response details
+              items:
+                type: object
+                properties:
+                  serviceDiscipline:
+                    type: string
+                    description: Discipline requested
+                    enum:
+                    - SN
+                    - PT
+                    - OT
+                    - MSW
+                    - HHA
+                    - ST
+                    - LPN
+                    example: SN
+                  disciplineAuthStatus:
+                    type: string
+                    description: Auth status of the unique requested discipline
+                    enum:
+                    - PENDING
+                    - APPROVED
+                    - DENIED
+                    - PARTIALLY APPROVED
+                    - EXCEPTION
+                    example: PENDING
+                  disciplineAuthNumber:
+                    type: string
+                    description: Authorization Number associated with the unique discipline for the authorization request
+                    example: A2344222333
+                  requestedUnits:
+                    type: integer
+                    description: Total qty requested for the unique discipline
+                    example: 10
+                  approvedUnits:
+                    type: integer
+                    description: Total visits approved for the unique discipline
+                    example: 5
+                  deniedUnits:
+                    type: integer
+                    description: Total visits denied for the unique discipline
+                    example: 3
+                  pendingUnits:
+                    type: integer
+                    description: Total visits pending for the unique discipline
+                    example: 2
+                  authStartDate:
+                    type: string
+                    format: date
+                    description: Authorization start date for the discipline - requested start date/approved start date. Date in ISO8601 format (YYYY-MM-DD)
+                    example: '2025-05-26'
+                  authEndDate:
+                    type: string
+                    format: date
+                    description: Authorization end date for the discipline - requested end date/approved end date. Date in ISO8601 format (YYYY-MM-DD)
+                    example: '2025-07-30'
+                  denialReason:
+                    type: string
+                    description: Reason provided for denial, if applicable
+            authResponseDocs:
+              type: array
+              description: Documents which are received as part of the Authorization Response
+              items:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    description: URL of a file which would be attached submitted as part of authorization request. Need creds for accessing SFTP (userID/pwd or token). Whitelisting will also be needed.
+                  attachmentType:
+                    type: string
+                    description: Type of the attachment
+                  attachmentName:
+                    type: string
+                    description: Name of the attachment
+            authExceptions:
+              type: string
+              description: Exceptions encountered during auth submission or retrieval process
+          required:
+          - authStatus
+      required:
+      - patientDetails
+      - payerDetails
+      - authorizationResponse
+    SubmitEligibilitySuccessResponse:
+      type: object
+      properties:
+        eligibilityResponse:
+          $ref: '#/components/schemas/EligibilityResponse'
+        eligibilityResponseDocs:
+          type: array
+          description: Documents which are received as part of the Eligibility Response
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+                description: 'URL pointing to a file in Element5''s object store. '
+              documentType:
+                type: string
+                description: 'Type of the docuement. Like PDF of eligibility info from payer, PDF of member ID card if available from payer, etc. '
+                example: Eligibility PDF
     EligibilityResponse:
       type: object
       properties:
@@ -650,15 +838,18 @@ components:
             required: []
       required:
       - patientDetails
-    TaskName:
-      type: string
-      enum:
-      - submit-authorization
-      - submit-eligibility
-    EligibilityTaskFailures:
+    AuthorizationTaskFailures:
       oneOf:
-      - $ref: '#/components/schemas/SubmitEligibilityFailure'
-    TaskFailed:
+      - $ref: '#/components/schemas/SubmitAuthorizationFailure'
+    SubmitAuthorizationSuccessResponse:
+      type: object
+      properties:
+        authResponse:
+          $ref: '#/components/schemas/AuthResponse'
+    AuthorizationTaskSuccesses:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitAuthorizationSuccess'
+    TaskQueued:
       type: object
       properties:
         taskId:
@@ -668,7 +859,45 @@ components:
         createdAt:
           $ref: '#/components/schemas/DateString'
         status:
-          $ref: '#/components/schemas/TaskStatus_Failed'
+          $ref: '#/components/schemas/TaskStatus_Queued'
+    AuthorizationTaskProgresses:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitAuthorizationProgress'
+    SubmitAuthorizationFailure_submitAuthorization:
+      type: object
+      properties:
+        failureReason:
+          type: string
+    TaskRestarted:
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Processing'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+    EligibilityTaskProgresses:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitEligibilityProgress'
+    TaskSucceeded:
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Success'
         startedAt:
           $ref: '#/components/schemas/DateString'
         endedAt:
@@ -677,98 +906,25 @@ components:
           minimum: 1
           type: integer
         taskPayload:
-          $ref: '#/components/schemas/TaskFailures'
-    SubmitEligibilityProgress:
+          $ref: '#/components/schemas/TaskSuccesses'
+    Element5WebhookRequest:
       type: object
       properties:
-        submitEligibility:
-          $ref: '#/components/schemas/SubmitEligibilityProgress_submitEligibility'
-    EligibilityTaskProgresses:
-      oneOf:
-      - $ref: '#/components/schemas/SubmitEligibilityProgress'
-    SubmitEligibilitySuccessResponse:
-      type: object
-      properties:
-        eligibilityResponse:
-          $ref: '#/components/schemas/EligibilityResponse'
-        eligibilityResponseDocs:
-          type: array
-          description: Documents which are received as part of the Eligibility Response
-          items:
-            type: object
-            properties:
-              url:
-                type: string
-                format: uri
-                description: 'URL pointing to a file in Element5''s object store. '
-              documentType:
-                type: string
-                description: 'Type of the docuement. Like PDF of eligibility info from payer, PDF of member ID card if available from payer, etc. '
-                example: Eligibility PDF
-    Element5Events:
-      type: string
-      enum:
-      - task#queued
-      - task#started
-      - task#restarted
-      - task#progressed
-      - task#succeeded
-      - task#failed
-    TaskStatus_Success:
-      type: string
-      enum:
-      - success
-    SubmitAuthorizationSuccess:
-      type: object
-      properties:
-        submitAuthorization:
-          $ref: '#/components/schemas/SubmitAuthorizationSuccessResponse'
-    SubmitAuthorizationFailure:
-      type: object
-      properties:
-        submitAuthorization:
-          $ref: '#/components/schemas/SubmitAuthorizationFailure_submitAuthorization'
-    AuthorizationTaskSuccesses:
-      oneOf:
-      - $ref: '#/components/schemas/SubmitAuthorizationSuccess'
-    TaskID:
-      type: string
-      format: uuid
-      example: 55dfe5e9-725a-4ce0-ba41-925e588623c2
-    TaskStatus_Processing:
-      type: string
-      enum:
-      - processing
-    SubmitAuthorizationSuccessResponse:
-      type: object
-      properties:
-        authResponse:
-          $ref: '#/components/schemas/AuthResponse'
-    SubmitAuthorizationProgress:
-      type: object
-      properties:
-        submitAuthorization:
-          $ref: '#/components/schemas/SubmitAuthorizationProgress_submitAuthorization'
-    TaskEvents:
-      type: object
-      properties:
-        task:
+        eventName:
+          $ref: '#/components/schemas/Element5Events'
+        eventId:
+          type: string
+          format: uuid
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        eventPayload:
           oneOf:
-          - $ref: '#/components/schemas/TaskQueued'
-          - $ref: '#/components/schemas/TaskStarted'
-          - $ref: '#/components/schemas/TaskRestarted'
-          - $ref: '#/components/schemas/TaskProgressed'
-          - $ref: '#/components/schemas/TaskSucceeded'
-          - $ref: '#/components/schemas/TaskFailed'
-    TaskSuccesses:
-      oneOf:
-      - $ref: '#/components/schemas/AuthorizationTaskSuccesses'
-      - $ref: '#/components/schemas/EligibilityTaskSuccesses'
-      discriminator:
-        propertyName: taskName
-        mapping:
-          submit-authorization: '#/components/schemas/AuthorizationTaskSuccesses'
-          submit-eligibility: '#/components/schemas/EligibilityTaskSuccesses'
+          - $ref: '#/components/schemas/TaskEvents'
+    SubmitAuthorizationProgress_submitAuthorization:
+      type: object
+      properties:
+        progress:
+          type: string
     EligibilityTaskSuccesses:
       oneOf:
       - $ref: '#/components/schemas/SubmitEligibilitySuccessResponse'
@@ -790,203 +946,47 @@ components:
           type: integer
         taskPayload:
           $ref: '#/components/schemas/TaskProgresses'
-    Element5WebhookRequest:
+    SubmitAuthorizationSuccess:
       type: object
       properties:
-        eventName:
-          $ref: '#/components/schemas/Element5Events'
-        eventId:
-          type: string
-          format: uuid
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        eventPayload:
-          oneOf:
-          - $ref: '#/components/schemas/TaskEvents'
-    AuthorizationTaskProgresses:
-      oneOf:
-      - $ref: '#/components/schemas/SubmitAuthorizationProgress'
-    SubmitAuthorizationProgress_submitAuthorization:
+        submitAuthorization:
+          $ref: '#/components/schemas/SubmitAuthorizationSuccessResponse'
+    SubmitEligibilityProgress:
+      type: object
+      properties:
+        submitEligibility:
+          $ref: '#/components/schemas/SubmitEligibilityProgress_submitEligibility'
+    SubmitEligibilityProgress_submitEligibility:
       type: object
       properties:
         progress:
           type: string
-    AuthorizationTaskFailures:
-      oneOf:
-      - $ref: '#/components/schemas/SubmitAuthorizationFailure'
-    AuthResponse:
+    TaskStatus_Success:
+      type: string
+      enum:
+      - success
+    TaskStarted:
       type: object
       properties:
-        patientDetails:
-          type: object
-          description: Patient Details
-          properties:
-            firstName:
-              type: string
-              description: Patient first name
-              maxLength: 50
-              minLength: 1
-              example: John
-            lastName:
-              type: string
-              description: Patient last name
-              maxLength: 50
-              minLength: 1
-              example: Smith
-            middleName:
-              type: string
-              description: Patient middle name
-              example: Edward
-            patientId:
-              type: string
-              description: 'Patient Unique ID - Eg: Medical Record number'
-              example: BOX00003977
-          required:
-          - firstName
-          - lastName
-          - patientId
-        payerDetails:
-          type: object
-          description: Payer Details
-          properties:
-            memberId:
-              type: string
-              description: Member identification number/payer policy number
-              example: W9837639
-            payerPlanName:
-              type: string
-              description: Payer Plan name of the patient
-              example: AARP® Medicare Advantage from UnitedHealthcare
-            gateway:
-              type: string
-              description: Gateway in which the authorization was submitted
-              example: UHC
-          required:
-          - memberId
-          - payerPlanName
-          - gateway
-        authorizationResponse:
-          description: Authorization Response Details
-          type: object
-          properties:
-            authNumber:
-              type: string
-              description: Authorization number returned from the payer after the request is placed
-            authStatus:
-              type: string
-              description: Status of the overall authorization request
-              enum:
-              - PENDING
-              - APPROVED
-              - DENIED
-              - PARTIALLY APPROVED
-              - EXCEPTION
-              example: PENDING
-            lastStatusCheck:
-              type: string
-              format: date
-              description: Timestamp of the last attempt to submit or check the authorization in the portal. Date in ISO8601 format (YYYY-MM-DD)
-              example: '2025-05-26'
-            payerResponseDate:
-              type: string
-              format: date
-              description: Date in which the payer gave a response of the request that is no longer pending. Date in ISO8601 format (YYYY-MM-DD)
-              example: '2025-07-30'
-            services:
-              type: array
-              description: Discipline level Auth response details
-              items:
-                type: object
-                properties:
-                  serviceDiscipline:
-                    type: string
-                    description: Discipline requested
-                    enum:
-                    - SN
-                    - PT
-                    - OT
-                    - MSW
-                    - HHA
-                    - ST
-                    - LPN
-                    example: SN
-                  disciplineAuthStatus:
-                    type: string
-                    description: Auth status of the unique requested discipline
-                    enum:
-                    - PENDING
-                    - APPROVED
-                    - DENIED
-                    - PARTIALLY APPROVED
-                    - EXCEPTION
-                    example: PENDING
-                  disciplineAuthNumber:
-                    type: string
-                    description: Authorization Number associated with the unique discipline for the authorization request
-                    example: A2344222333
-                  requestedUnits:
-                    type: integer
-                    description: Total qty requested for the unique discipline
-                    example: 10
-                  approvedUnits:
-                    type: integer
-                    description: Total visits approved for the unique discipline
-                    example: 5
-                  deniedUnits:
-                    type: integer
-                    description: Total visits denied for the unique discipline
-                    example: 3
-                  pendingUnits:
-                    type: integer
-                    description: Total visits pending for the unique discipline
-                    example: 2
-                  authStartDate:
-                    type: string
-                    format: date
-                    description: Authorization start date for the discipline - requested start date/approved start date. Date in ISO8601 format (YYYY-MM-DD)
-                    example: '2025-05-26'
-                  authEndDate:
-                    type: string
-                    format: date
-                    description: Authorization end date for the discipline - requested end date/approved end date. Date in ISO8601 format (YYYY-MM-DD)
-                    example: '2025-07-30'
-                  denialReason:
-                    type: string
-                    description: Reason provided for denial, if applicable
-            authResponseDocs:
-              type: array
-              description: Documents which are received as part of the Authorization Response
-              items:
-                type: object
-                properties:
-                  url:
-                    type: string
-                    format: uri
-                    description: URL of a file which would be attached submitted as part of authorization request. Need creds for accessing SFTP (userID/pwd or token). Whitelisting will also be needed.
-                  attachmentType:
-                    type: string
-                    description: Type of the attachment
-                  attachmentName:
-                    type: string
-                    description: Name of the attachment
-            authExceptions:
-              type: string
-              description: Exceptions encountered during auth submission or retrieval process
-          required:
-          - authStatus
-      required:
-      - patientDetails
-      - payerDetails
-      - authorizationResponse
-    TaskProgresses:
-      oneOf:
-      - $ref: '#/components/schemas/AuthorizationTaskProgresses'
-      - $ref: '#/components/schemas/EligibilityTaskProgresses'
-      discriminator:
-        propertyName: taskName
-        mapping:
-          submit-authorization: '#/components/schemas/AuthorizationTaskProgresses'
-          submit-eligibility: '#/components/schemas/EligibilityTaskProgresses'
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Processing'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+          example: 1
+    SubmitEligibilityFailure_submitEligibility:
+      type: object
+      properties:
+        failureReason:
+          type: string
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

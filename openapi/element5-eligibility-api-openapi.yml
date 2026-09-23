@@ -7,7 +7,7 @@ info:
     # Authentication
 
 
-    <!-- ReDoc-Inject: <security-definitions> -->'
+    -->'
   contact:
     email: apisupport@e5.ai
   version: 2.2.0
@@ -178,193 +178,211 @@ paths:
       - ApiKeyAuth: []
 components:
   schemas:
-    TaskName_ProcessX12EligibilityTransaction:
+    TaskID:
       type: string
-      title: TaskName
-      enum:
-      - process-x12-eligibility-transaction
-    SubmitEligibilityRequestPayload:
+      format: uuid
+      example: 55dfe5e9-725a-4ce0-ba41-925e588623c2
+    SubmitEligibilityFailure:
       type: object
       properties:
-        senderDetails:
+        submitEligibility:
+          $ref: '#/components/schemas/SubmitEligibilityFailure_submitEligibility'
+    TaskStarted_Eligibility:
+      type: object
+      title: TaskStarted
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_Eligibility'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Processing'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+          example: 1
+    TaskProgressed_EdiExchange:
+      title: TaskProgressed
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_ProcessX12EligibilityTransaction'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Processing'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+        taskPayload:
           type: object
           properties:
-            partnerName:
-              type: string
-              description: Partner entity Name
-              example: Wellsky
-            organizationName:
-              type: string
-              description: Organization/Corporation name of the entity requesting the service
-              example: 11111-Affinity
-            agencyName:
-              type: string
-              description: Agency/Clinic name associated to the service
-              example: Polk
-            branchName:
-              type: string
-              description: Branch name associated to the service
-              example: Branch1
-          required:
-          - partnerName
-          - organizationName
-          - agencyName
-          - branchName
-        patientDetails:
-          type: object
-          properties:
-            firstName:
-              type: string
-              description: Patient's first name as recorded in EHR
-              maxLength: 50
-              minLength: 1
-            lastName:
-              type: string
-              description: Patient's last name as recorded in EHR
-              maxLength: 50
-              minLength: 1
-            middleName:
-              type: string
-              description: Patient's middle name as recorded in EHR
-              maxLength: 50
-              minLength: 1
-            patientId:
-              type: string
-              description: Medical Record Number assigned to the patient in the EHR.
-            dateOfBirth:
-              type: string
-              format: date
-              description: Date of birth of the patient as per EHR. Date in ISO8601 format
-              example: '1945-01-15'
-            gender:
-              type: string
-              description: Gender of the patient as per EHR
-              enum:
-              - M
-              - F
-            startOfCareDate:
-              type: string
-              description: The date the care episode or service started for the patient. Date in ISO8601 format
-              format: date
-              example: '2024-06-15'
-            patientAddress:
+            response:
               type: object
-              description: Patient's address as recorded in EHR
-              properties:
-                addressLine1:
-                  type: string
-                  description: Patient's address line 1
-                addressLine2:
-                  type: string
-                  description: Patient's address line 2
-                city:
-                  type: string
-                  description: Patient's city
-                state:
-                  type: string
-                  description: Patient's state
-                zip:
-                  type: string
-                  description: Patient's zip
-          required:
-          - firstName
-          - lastName
-          - dateOfBirth
-          - patientId
-          - gender
-        payerDetails:
+    TaskStatus_Failed:
+      type: string
+      enum:
+      - failed
+    inline_response_200_process_x12_eligibility_transaction:
+      oneOf:
+      - $ref: '#/components/schemas/TaskStarted_EdiExchange'
+      - $ref: '#/components/schemas/TaskQueued_EdiExchange'
+      - $ref: '#/components/schemas/TaskRestarted_EdiExchange'
+      - $ref: '#/components/schemas/TaskProgressed_EdiExchange'
+      - $ref: '#/components/schemas/TaskSucceeded_EdiExchange'
+      - $ref: '#/components/schemas/TaskFailed_EdiExchange'
+    TaskFailed_Eligibility:
+      type: object
+      title: TaskFailed
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_Eligibility'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Failed'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        endedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+        taskPayload:
+          $ref: '#/components/schemas/EligibilityTaskFailures'
+    TaskFailed_EdiExchange:
+      type: object
+      title: TaskFailed
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_ProcessX12EligibilityTransaction'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Failed'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        endedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+        taskPayload:
           type: object
           properties:
-            payerName:
-              type: string
-              description: Payer name
-            payerPlanName:
-              type: string
-              description: Payer Plan name of the patient as in EHR
-            payerType:
-              type: string
-              description: Payer type of the patient as in EHR
-            payerId:
-              type: string
-              description: Payor ID to submit the request to clearinghouse/Payer.
-            payerHierarchy:
-              type: string
-              description: Indicates whether the insurance is Primary, Secondary, or Tertiary. (P/S/T)
-              enum:
-              - P
-              - S
-              - T
-            memberId:
-              type: string
-              description: Member identification number provided by the payer and stored in the EHR
-            MBI:
-              type: string
-              description: Medicare beneficiary ID, if Medicare Patient
-            medicaidID:
-              type: string
-              description: Medicaid ID, if applicable
-          required:
-          - payerPlanName
-          - payerName
-          - payerType
-          - memberId
-        gateway:
-          oneOf:
-          - $ref: '#/components/schemas/WaystarGateway'
-          - $ref: '#/components/schemas/UHCGateway'
-          - $ref: '#/components/schemas/AvailityGateway'
-          discriminator:
-            propertyName: gatewayName
-            mapping:
-              Waystar: '#/components/schemas/WaystarGateway'
-              UHC: '#/components/schemas/UHCGateway'
-              Availity: '#/components/schemas/AvailityGateway'
-        servicingProviderDetails:
-          type: object
-          properties:
-            branch:
-              type: string
-              description: Branch Name submitting the request
-            branchNPI:
-              type: string
-              description: Branch NPI submitting the request
-            branchAddress:
+            response:
               type: object
-              description: Branch's address as recorded in EHR
               properties:
-                addressLine1:
+                failureReason:
                   type: string
-                  description: Branch's address line 1
-                addressLine2:
-                  type: string
-                  description: Branch's address line 2
-                city:
-                  type: string
-                  description: Branch's city
-                state:
-                  type: string
-                  description: Branch's state
-                zip:
-                  type: string
-                  description: Branch's zip
-          required:
-          - branch
-          - branchNPI
-        serviceTypeCodes:
-          type: array
-          items:
-            type: string
-            enum:
-            - '30'
-            - '42'
-            - '45'
-          description: 'Service type codes to check eligibility. Use 270 codeset for service codes: 30 - General, 42 - Home Health, 45 - Hospice'
-      required:
-      - patientDetails
-      - payerDetails
-      - servicingProviderDetails
-      - serviceTypeCodes
-      - senderDetails
+    TaskRequestSuccessResponse_ProcessX12EligibilityTransaction:
+      type: object
+      title: TaskRequestSuccessResponse
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_ProcessX12EligibilityTransaction'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Queued'
+      description: Task Request has succeeded
+    AuthorizationError:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '403'
+        message:
+          type: string
+          example: Access forbidden. The API key is valid but does not have permission to access this resource.
+    TaskProgressed_Eligibility:
+      title: TaskProgressed
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_Eligibility'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Processing'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+        taskPayload:
+          $ref: '#/components/schemas/EligibilityTaskProgresses'
+    UHCGateway:
+      type: object
+      properties:
+        gatewayName:
+          type: string
+          enum:
+          - UHC
+          description: Clearinghouse/Payor to check eligibility
+        uhcTaxIdNumber:
+          type: string
+          description: TaxID loaded in the gateway for the given records location - UHC
+        uhcCorporateTaxOwnerId:
+          type: string
+          description: Corporate Tax Owner ID loaded in the gateway for the given records location - UHC
+        uhcPortalCareProvider:
+          type: string
+          description: Care Provider loaded in the gateway for the given records location - UHC
+      required: []
+    DateString:
+      type: string
+      description: Date and time in ISO8601 format
+      format: date-time
+      example: '2017-07-21T17:32:28Z'
+    AvailityGateway:
+      type: object
+      properties:
+        gatewayName:
+          type: string
+          enum:
+          - Availity
+          description: Clearinghouse / Payor to check eligibility
+        availityProviderName:
+          type: string
+          description: Name of the provider to check eligibility with Availity
+      required: []
+    TaskQueued_EdiExchange:
+      type: object
+      title: TaskQueued
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_ProcessX12EligibilityTransaction'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Queued'
+    TaskStatus_Processing:
+      type: string
+      enum:
+      - processing
+    TaskStatus_Queued:
+      type: string
+      enum:
+      - queued
     ProcessX12EligibilityTransactionRequest:
       required:
       - taskPayload
@@ -372,10 +390,6 @@ components:
       properties:
         taskPayload:
           $ref: '#/components/schemas/ProcessX12EligibilityTransactionRequestPayload'
-    TaskStatus_Queued:
-      type: string
-      enum:
-      - queued
     ProcessX12EligibilityTransactionAttachment270:
       type: object
       description: X12 270 file.
@@ -402,6 +416,203 @@ components:
         interchangeTimezone:
           type: string
           description: Timezone of submission time. Mandatory when interchangeDate is provided.
+    inline_response_200_eligibility:
+      oneOf:
+      - $ref: '#/components/schemas/TaskStarted_Eligibility'
+      - $ref: '#/components/schemas/TaskQueued_Eligibility'
+      - $ref: '#/components/schemas/TaskRestarted_Eligibility'
+      - $ref: '#/components/schemas/TaskProgressed_Eligibility'
+      - $ref: '#/components/schemas/TaskSucceeded_Eligibility'
+      - $ref: '#/components/schemas/TaskFailed_Eligibility'
+    EligibilityTaskFailures:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitEligibilityFailure'
+    TaskSucceeded_Eligibility:
+      type: object
+      title: TaskSucceeded
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_Eligibility'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Success'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        endedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+        taskPayload:
+          $ref: '#/components/schemas/EligibilityTaskSuccesses'
+    TaskName_ProcessX12EligibilityTransaction:
+      type: string
+      title: TaskName
+      enum:
+      - process-x12-eligibility-transaction
+    ProcessX12EligibilityTransactionRequestPayload:
+      type: object
+      required:
+      - transactionFiles
+      - meta
+      properties:
+        transactionFiles:
+          type: object
+          description: X12 270 (request) and X12 271 (response) files.
+          properties:
+            requestFile:
+              $ref: '#/components/schemas/ProcessX12EligibilityTransactionAttachment270'
+            responseFile:
+              $ref: '#/components/schemas/ProcessX12EligibilityTransactionAttachment271'
+          required:
+          - requestFile
+          - responseFile
+        meta:
+          type: object
+          properties:
+            eligibilityRequestInitiationDate:
+              type: string
+              format: date
+              description: The date, eligibility request was initiated by the source system
+              example: '1981-12-25'
+            gatewayName:
+              type: string
+              description: Clearinghouse or payer used to check eligibility (for example Availity, Waystar, UHC).
+              example: Inovalon
+            senderDetails:
+              type: object
+              description: Sender details.
+              required:
+              - partnerName
+              - organizationName
+              - agencyName
+              - branchName
+              properties:
+                partnerName:
+                  type: string
+                  description: Partner entity name.
+                  example: Wellsky
+                organizationName:
+                  type: string
+                  description: Organization or corporation name of the entity requesting the service.
+                  example: 11111-Affinity
+                agencyName:
+                  type: string
+                  description: Agency or clinic name associated with the service.
+                  example: Polk
+                branchName:
+                  type: string
+                  description: Branch name associated with the service.
+                  example: Branch1
+            patientDetails:
+              type: object
+              description: Patient details.
+              required:
+              - firstName
+              - lastName
+              - patientID
+              - dateOfBirth
+              - startOfCareDate
+              properties:
+                firstName:
+                  type: string
+                  description: Patient first name.
+                  minLength: 1
+                  maxLength: 50
+                  example: John
+                lastName:
+                  type: string
+                  description: Patient last name.
+                  minLength: 1
+                  maxLength: 50
+                  example: Smith
+                middleName:
+                  type: string
+                  description: Patient middle name.
+                  example: Edward
+                patientID:
+                  type: string
+                  description: Patient unique identifier (for example medical record number).
+                  example: BOX00003977
+                dateOfBirth:
+                  type: string
+                  format: date
+                  description: Patient date of birth. ISO 8601 date.
+                  example: '1981-12-25'
+                startOfCareDate:
+                  type: string
+                  format: date
+                  description: Patient care episode or service start date. ISO 8601 date.
+                  example: '1981-12-25'
+            payerDetails:
+              type: object
+              description: Payer details. Exactly one of memberId, MBI, or medicaidID must be provided.
+              required:
+              - payerName
+              - payerPlanName
+              - payerType
+              - payerHierarchy
+              properties:
+                payerName:
+                  type: string
+                  description: Payer name.
+                  example: UHC
+                payerPlanName:
+                  type: string
+                  description: Payer plan name of the patient as in the EHR.
+                  example: AARP Medicare Advantage from UnitedHealthcare
+                payerType:
+                  type: string
+                  description: Payer type of the patient as in the EHR.
+                  example: MA
+                payerHierarchy:
+                  type: string
+                  description: Whether the insurance is primary, secondary, or tertiary (P, S, or T).
+                  enum:
+                  - P
+                  - S
+                  - T
+                  example: P
+              oneOf:
+              - properties:
+                  memberId:
+                    type: string
+                    description: Member identification number or payer policy number.
+                    example: W9837639
+                required:
+                - memberId
+              - properties:
+                  MBI:
+                    type: string
+                    description: Medicare beneficiary identifier, for Medicare patients.
+                    example: 3FH9AA4K221
+                required:
+                - MBI
+              - properties:
+                  medicaidID:
+                    type: string
+                    description: Medicaid identifier, if applicable.
+                    example: '500123456789'
+                required:
+                - medicaidID
+          required:
+          - senderDetails
+          - patientDetails
+          - payerDetails
+          - gatewayName
+          - eligibilityRequestInitiationDate
+    AuthError:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '401'
+        message:
+          type: string
+          example: API key is missing or invalid
     TaskSucceeded_EdiExchange:
       type: object
       title: TaskSucceeded
@@ -426,6 +637,24 @@ components:
           properties:
             response:
               type: object
+    TaskStarted_EdiExchange:
+      type: object
+      title: TaskStarted
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_ProcessX12EligibilityTransaction'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Processing'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+          example: 1
     TaskRequestFailedResponse:
       type: object
       properties:
@@ -434,100 +663,25 @@ components:
         reason:
           type: string
       description: Task Request has failed
-    TaskRestarted_EdiExchange:
-      type: object
-      title: TaskRestarted
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName_ProcessX12EligibilityTransaction'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Processing'
-        startedAt:
-          $ref: '#/components/schemas/DateString'
-        attempt:
-          minimum: 1
-          type: integer
-    TaskStatus_Failed:
-      type: string
-      enum:
-      - failed
-    SubmitEligibilityFailure_submitEligibility:
+    SubmitEligibilitySuccessResponse:
       type: object
       properties:
-        failureReason:
-          type: string
-    SubmitEligibilityFailure:
-      type: object
-      properties:
-        submitEligibility:
-          $ref: '#/components/schemas/SubmitEligibilityFailure_submitEligibility'
-    DateString:
-      type: string
-      description: Date and time in ISO8601 format
-      format: date-time
-      example: '2017-07-21T17:32:28Z'
-    TaskRequestSuccessResponse_ProcessX12EligibilityTransaction:
-      type: object
-      title: TaskRequestSuccessResponse
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName_ProcessX12EligibilityTransaction'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Queued'
-      description: Task Request has succeeded
-    TaskProgressed_Eligibility:
-      title: TaskProgressed
-      type: object
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName_Eligibility'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Processing'
-        startedAt:
-          $ref: '#/components/schemas/DateString'
-        attempt:
-          minimum: 1
-          type: integer
-        taskPayload:
-          $ref: '#/components/schemas/EligibilityTaskProgresses'
-    SubmitEligibilityProgress_submitEligibility:
-      type: object
-      properties:
-        progress:
-          type: string
-    TaskSucceeded_Eligibility:
-      type: object
-      title: TaskSucceeded
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName_Eligibility'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Success'
-        startedAt:
-          $ref: '#/components/schemas/DateString'
-        endedAt:
-          $ref: '#/components/schemas/DateString'
-        attempt:
-          minimum: 1
-          type: integer
-        taskPayload:
-          $ref: '#/components/schemas/EligibilityTaskSuccesses'
+        eligibilityResponse:
+          $ref: '#/components/schemas/EligibilityResponse'
+        eligibilityResponseDocs:
+          type: array
+          description: Documents which are received as part of the Eligibility Response
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+                description: 'URL pointing to a file in Element5''s object store. '
+              documentType:
+                type: string
+                description: 'Type of the docuement. Like PDF of eligibility info from payer, PDF of member ID card if available from payer, etc. '
+                example: Eligibility PDF
     EligibilityResponse:
       type: object
       properties:
@@ -1023,184 +1177,36 @@ components:
             required: []
       required:
       - patientDetails
-    EligibilityTaskFailures:
-      oneOf:
-      - $ref: '#/components/schemas/SubmitEligibilityFailure'
-    TaskStarted_Eligibility:
-      type: object
-      title: TaskStarted
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName_Eligibility'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Processing'
-        startedAt:
-          $ref: '#/components/schemas/DateString'
-        attempt:
-          minimum: 1
-          type: integer
-          example: 1
-    ProcessX12EligibilityTransactionRequestPayload:
-      type: object
+    TaskName_Eligibility:
+      type: string
+      title: TaskName
+      enum:
+      - submit-eligibility
+    SubmitEligibilityRequest:
       required:
-      - transactionFiles
-      - meta
-      properties:
-        transactionFiles:
-          type: object
-          description: X12 270 (request) and X12 271 (response) files.
-          properties:
-            requestFile:
-              $ref: '#/components/schemas/ProcessX12EligibilityTransactionAttachment270'
-            responseFile:
-              $ref: '#/components/schemas/ProcessX12EligibilityTransactionAttachment271'
-          required:
-          - requestFile
-          - responseFile
-        meta:
-          type: object
-          properties:
-            eligibilityRequestInitiationDate:
-              type: string
-              format: date
-              description: The date, eligibility request was initiated by the source system
-              example: '1981-12-25'
-            gatewayName:
-              type: string
-              description: Clearinghouse or payer used to check eligibility (for example Availity, Waystar, UHC).
-              example: Inovalon
-            senderDetails:
-              type: object
-              description: Sender details.
-              required:
-              - partnerName
-              - organizationName
-              - agencyName
-              - branchName
-              properties:
-                partnerName:
-                  type: string
-                  description: Partner entity name.
-                  example: Wellsky
-                organizationName:
-                  type: string
-                  description: Organization or corporation name of the entity requesting the service.
-                  example: 11111-Affinity
-                agencyName:
-                  type: string
-                  description: Agency or clinic name associated with the service.
-                  example: Polk
-                branchName:
-                  type: string
-                  description: Branch name associated with the service.
-                  example: Branch1
-            patientDetails:
-              type: object
-              description: Patient details.
-              required:
-              - firstName
-              - lastName
-              - patientID
-              - dateOfBirth
-              - startOfCareDate
-              properties:
-                firstName:
-                  type: string
-                  description: Patient first name.
-                  minLength: 1
-                  maxLength: 50
-                  example: John
-                lastName:
-                  type: string
-                  description: Patient last name.
-                  minLength: 1
-                  maxLength: 50
-                  example: Smith
-                middleName:
-                  type: string
-                  description: Patient middle name.
-                  example: Edward
-                patientID:
-                  type: string
-                  description: Patient unique identifier (for example medical record number).
-                  example: BOX00003977
-                dateOfBirth:
-                  type: string
-                  format: date
-                  description: Patient date of birth. ISO 8601 date.
-                  example: '1981-12-25'
-                startOfCareDate:
-                  type: string
-                  format: date
-                  description: Patient care episode or service start date. ISO 8601 date.
-                  example: '1981-12-25'
-            payerDetails:
-              type: object
-              description: Payer details. Exactly one of memberId, MBI, or medicaidID must be provided.
-              required:
-              - payerName
-              - payerPlanName
-              - payerType
-              - payerHierarchy
-              properties:
-                payerName:
-                  type: string
-                  description: Payer name.
-                  example: UHC
-                payerPlanName:
-                  type: string
-                  description: Payer plan name of the patient as in the EHR.
-                  example: AARP Medicare Advantage from UnitedHealthcare
-                payerType:
-                  type: string
-                  description: Payer type of the patient as in the EHR.
-                  example: MA
-                payerHierarchy:
-                  type: string
-                  description: Whether the insurance is primary, secondary, or tertiary (P, S, or T).
-                  enum:
-                  - P
-                  - S
-                  - T
-                  example: P
-              oneOf:
-              - properties:
-                  memberId:
-                    type: string
-                    description: Member identification number or payer policy number.
-                    example: W9837639
-                required:
-                - memberId
-              - properties:
-                  MBI:
-                    type: string
-                    description: Medicare beneficiary identifier, for Medicare patients.
-                    example: 3FH9AA4K221
-                required:
-                - MBI
-              - properties:
-                  medicaidID:
-                    type: string
-                    description: Medicaid identifier, if applicable.
-                    example: '500123456789'
-                required:
-                - medicaidID
-          required:
-          - senderDetails
-          - patientDetails
-          - payerDetails
-          - gatewayName
-          - eligibilityRequestInitiationDate
-    EligibilityTaskProgresses:
-      oneOf:
-      - $ref: '#/components/schemas/SubmitEligibilityProgress'
-    TaskQueued_EdiExchange:
+      - taskPayload
       type: object
-      title: TaskQueued
+      properties:
+        taskPayload:
+          $ref: '#/components/schemas/SubmitEligibilityRequestPayload'
+    WaystarGateway:
+      type: object
+      properties:
+        gatewayName:
+          type: string
+          enum:
+          - Waystar
+          description: Clearinghouse/Payor to check eligibility
+        waystarSenderId:
+          type: string
+          description: Waystar Sender ID assigned to the client - Required for Waystar
+        waystarProviderName:
+          type: string
+          description: Waystar associated provider name assigned to the location servicing the patient - Required for Waystar
+      required: []
+    TaskRestarted_EdiExchange:
+      type: object
+      title: TaskRestarted
       properties:
         taskId:
           $ref: '#/components/schemas/TaskID'
@@ -1209,133 +1215,15 @@ components:
         createdAt:
           $ref: '#/components/schemas/DateString'
         status:
-          $ref: '#/components/schemas/TaskStatus_Queued'
-    SubmitEligibilityProgress:
-      type: object
-      properties:
-        submitEligibility:
-          $ref: '#/components/schemas/SubmitEligibilityProgress_submitEligibility'
-    SubmitEligibilitySuccessResponse:
-      type: object
-      properties:
-        eligibilityResponse:
-          $ref: '#/components/schemas/EligibilityResponse'
-        eligibilityResponseDocs:
-          type: array
-          description: Documents which are received as part of the Eligibility Response
-          items:
-            type: object
-            properties:
-              url:
-                type: string
-                format: uri
-                description: 'URL pointing to a file in Element5''s object store. '
-              documentType:
-                type: string
-                description: 'Type of the docuement. Like PDF of eligibility info from payer, PDF of member ID card if available from payer, etc. '
-                example: Eligibility PDF
-    TaskRequestSuccessResponse_Eligibility:
-      type: object
-      title: TaskRequestSuccessResponse
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName_Eligibility'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Queued'
-      description: Task Request has succeeded
-    TaskRestarted_Eligibility:
-      type: object
-      title: TaskRestarted
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName_Eligibility'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
           $ref: '#/components/schemas/TaskStatus_Processing'
         startedAt:
           $ref: '#/components/schemas/DateString'
         attempt:
           minimum: 1
           type: integer
-    TaskFailed_Eligibility:
-      type: object
-      title: TaskFailed
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName_Eligibility'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Failed'
-        startedAt:
-          $ref: '#/components/schemas/DateString'
-        endedAt:
-          $ref: '#/components/schemas/DateString'
-        attempt:
-          minimum: 1
-          type: integer
-        taskPayload:
-          $ref: '#/components/schemas/EligibilityTaskFailures'
-    TaskStatus_Success:
-      type: string
-      enum:
-      - success
-    inline_response_200_process_x12_eligibility_transaction:
+    EligibilityTaskProgresses:
       oneOf:
-      - $ref: '#/components/schemas/TaskStarted_EdiExchange'
-      - $ref: '#/components/schemas/TaskQueued_EdiExchange'
-      - $ref: '#/components/schemas/TaskRestarted_EdiExchange'
-      - $ref: '#/components/schemas/TaskProgressed_EdiExchange'
-      - $ref: '#/components/schemas/TaskSucceeded_EdiExchange'
-      - $ref: '#/components/schemas/TaskFailed_EdiExchange'
-    TaskID:
-      type: string
-      format: uuid
-      example: 55dfe5e9-725a-4ce0-ba41-925e588623c2
-    TaskStatus_Processing:
-      type: string
-      enum:
-      - processing
-    UHCGateway:
-      type: object
-      properties:
-        gatewayName:
-          type: string
-          enum:
-          - UHC
-          description: Clearinghouse/Payor to check eligibility
-        uhcTaxIdNumber:
-          type: string
-          description: TaxID loaded in the gateway for the given records location - UHC
-        uhcCorporateTaxOwnerId:
-          type: string
-          description: Corporate Tax Owner ID loaded in the gateway for the given records location - UHC
-        uhcPortalCareProvider:
-          type: string
-          description: Care Provider loaded in the gateway for the given records location - UHC
-      required: []
-    inline_response_200_eligibility:
-      oneOf:
-      - $ref: '#/components/schemas/TaskStarted_Eligibility'
-      - $ref: '#/components/schemas/TaskQueued_Eligibility'
-      - $ref: '#/components/schemas/TaskRestarted_Eligibility'
-      - $ref: '#/components/schemas/TaskProgressed_Eligibility'
-      - $ref: '#/components/schemas/TaskSucceeded_Eligibility'
-      - $ref: '#/components/schemas/TaskFailed_Eligibility'
-    TaskName_Eligibility:
-      type: string
-      title: TaskName
-      enum:
-      - submit-eligibility
+      - $ref: '#/components/schemas/SubmitEligibilityProgress'
     ProcessX12EligibilityTransactionAttachment271:
       type: object
       description: X12 271 file
@@ -1362,128 +1250,201 @@ components:
         interchangeTimezone:
           type: string
           description: Timezone of response time. Mandatory when interchangeDate is provided.
-    SubmitEligibilityRequest:
-      required:
-      - taskPayload
+    SubmitEligibilityRequestPayload:
       type: object
       properties:
-        taskPayload:
-          $ref: '#/components/schemas/SubmitEligibilityRequestPayload'
-    AvailityGateway:
-      type: object
-      properties:
-        gatewayName:
-          type: string
-          enum:
-          - Availity
-          description: Clearinghouse / Payor to check eligibility
-        availityProviderName:
-          type: string
-          description: Name of the provider to check eligibility with Availity
-      required: []
-    TaskProgressed_EdiExchange:
-      title: TaskProgressed
-      type: object
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName_ProcessX12EligibilityTransaction'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Processing'
-        startedAt:
-          $ref: '#/components/schemas/DateString'
-        attempt:
-          minimum: 1
-          type: integer
-        taskPayload:
+        senderDetails:
           type: object
           properties:
-            response:
-              type: object
-    AuthError:
-      type: object
-      properties:
-        code:
-          type: string
-          example: '401'
-        message:
-          type: string
-          example: API key is missing or invalid
-    EligibilityTaskSuccesses:
-      oneOf:
-      - $ref: '#/components/schemas/SubmitEligibilitySuccessResponse'
-    WaystarGateway:
-      type: object
-      properties:
-        gatewayName:
-          type: string
-          enum:
-          - Waystar
-          description: Clearinghouse/Payor to check eligibility
-        waystarSenderId:
-          type: string
-          description: Waystar Sender ID assigned to the client - Required for Waystar
-        waystarProviderName:
-          type: string
-          description: Waystar associated provider name assigned to the location servicing the patient - Required for Waystar
-      required: []
-    TaskStarted_EdiExchange:
-      type: object
-      title: TaskStarted
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName_ProcessX12EligibilityTransaction'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Processing'
-        startedAt:
-          $ref: '#/components/schemas/DateString'
-        attempt:
-          minimum: 1
-          type: integer
-          example: 1
-    TaskFailed_EdiExchange:
-      type: object
-      title: TaskFailed
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName_ProcessX12EligibilityTransaction'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Failed'
-        startedAt:
-          $ref: '#/components/schemas/DateString'
-        endedAt:
-          $ref: '#/components/schemas/DateString'
-        attempt:
-          minimum: 1
-          type: integer
-        taskPayload:
+            partnerName:
+              type: string
+              description: Partner entity Name
+              example: Wellsky
+            organizationName:
+              type: string
+              description: Organization/Corporation name of the entity requesting the service
+              example: 11111-Affinity
+            agencyName:
+              type: string
+              description: Agency/Clinic name associated to the service
+              example: Polk
+            branchName:
+              type: string
+              description: Branch name associated to the service
+              example: Branch1
+          required:
+          - partnerName
+          - organizationName
+          - agencyName
+          - branchName
+        patientDetails:
           type: object
           properties:
-            response:
+            firstName:
+              type: string
+              description: Patient's first name as recorded in EHR
+              maxLength: 50
+              minLength: 1
+            lastName:
+              type: string
+              description: Patient's last name as recorded in EHR
+              maxLength: 50
+              minLength: 1
+            middleName:
+              type: string
+              description: Patient's middle name as recorded in EHR
+              maxLength: 50
+              minLength: 1
+            patientId:
+              type: string
+              description: Medical Record Number assigned to the patient in the EHR.
+            dateOfBirth:
+              type: string
+              format: date
+              description: Date of birth of the patient as per EHR. Date in ISO8601 format
+              example: '1945-01-15'
+            gender:
+              type: string
+              description: Gender of the patient as per EHR
+              enum:
+              - M
+              - F
+            startOfCareDate:
+              type: string
+              description: The date the care episode or service started for the patient. Date in ISO8601 format
+              format: date
+              example: '2024-06-15'
+            patientAddress:
               type: object
+              description: Patient's address as recorded in EHR
               properties:
-                failureReason:
+                addressLine1:
                   type: string
-    AuthorizationError:
+                  description: Patient's address line 1
+                addressLine2:
+                  type: string
+                  description: Patient's address line 2
+                city:
+                  type: string
+                  description: Patient's city
+                state:
+                  type: string
+                  description: Patient's state
+                zip:
+                  type: string
+                  description: Patient's zip
+          required:
+          - firstName
+          - lastName
+          - dateOfBirth
+          - patientId
+          - gender
+        payerDetails:
+          type: object
+          properties:
+            payerName:
+              type: string
+              description: Payer name
+            payerPlanName:
+              type: string
+              description: Payer Plan name of the patient as in EHR
+            payerType:
+              type: string
+              description: Payer type of the patient as in EHR
+            payerId:
+              type: string
+              description: Payor ID to submit the request to clearinghouse/Payer.
+            payerHierarchy:
+              type: string
+              description: Indicates whether the insurance is Primary, Secondary, or Tertiary. (P/S/T)
+              enum:
+              - P
+              - S
+              - T
+            memberId:
+              type: string
+              description: Member identification number provided by the payer and stored in the EHR
+            MBI:
+              type: string
+              description: Medicare beneficiary ID, if Medicare Patient
+            medicaidID:
+              type: string
+              description: Medicaid ID, if applicable
+          required:
+          - payerPlanName
+          - payerName
+          - payerType
+          - memberId
+        gateway:
+          oneOf:
+          - $ref: '#/components/schemas/WaystarGateway'
+          - $ref: '#/components/schemas/UHCGateway'
+          - $ref: '#/components/schemas/AvailityGateway'
+          discriminator:
+            propertyName: gatewayName
+            mapping:
+              Waystar: '#/components/schemas/WaystarGateway'
+              UHC: '#/components/schemas/UHCGateway'
+              Availity: '#/components/schemas/AvailityGateway'
+        servicingProviderDetails:
+          type: object
+          properties:
+            branch:
+              type: string
+              description: Branch Name submitting the request
+            branchNPI:
+              type: string
+              description: Branch NPI submitting the request
+            branchAddress:
+              type: object
+              description: Branch's address as recorded in EHR
+              properties:
+                addressLine1:
+                  type: string
+                  description: Branch's address line 1
+                addressLine2:
+                  type: string
+                  description: Branch's address line 2
+                city:
+                  type: string
+                  description: Branch's city
+                state:
+                  type: string
+                  description: Branch's state
+                zip:
+                  type: string
+                  description: Branch's zip
+          required:
+          - branch
+          - branchNPI
+        serviceTypeCodes:
+          type: array
+          items:
+            type: string
+            enum:
+            - '30'
+            - '42'
+            - '45'
+          description: 'Service type codes to check eligibility. Use 270 codeset for service codes: 30 - General, 42 - Home Health, 45 - Hospice'
+      required:
+      - patientDetails
+      - payerDetails
+      - servicingProviderDetails
+      - serviceTypeCodes
+      - senderDetails
+    TaskRequestSuccessResponse_Eligibility:
       type: object
+      title: TaskRequestSuccessResponse
       properties:
-        code:
-          type: string
-          example: '403'
-        message:
-          type: string
-          example: Access forbidden. The API key is valid but does not have permission to access this resource.
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_Eligibility'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Queued'
+      description: Task Request has succeeded
     TaskQueued_Eligibility:
       type: object
       title: TaskQueued
@@ -1496,6 +1457,45 @@ components:
           $ref: '#/components/schemas/DateString'
         status:
           $ref: '#/components/schemas/TaskStatus_Queued'
+    EligibilityTaskSuccesses:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitEligibilitySuccessResponse'
+    TaskRestarted_Eligibility:
+      type: object
+      title: TaskRestarted
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName_Eligibility'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Processing'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+    SubmitEligibilityProgress:
+      type: object
+      properties:
+        submitEligibility:
+          $ref: '#/components/schemas/SubmitEligibilityProgress_submitEligibility'
+    SubmitEligibilityProgress_submitEligibility:
+      type: object
+      properties:
+        progress:
+          type: string
+    TaskStatus_Success:
+      type: string
+      enum:
+      - success
+    SubmitEligibilityFailure_submitEligibility:
+      type: object
+      properties:
+        failureReason:
+          type: string
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

@@ -14,10 +14,12 @@
   "warnings": [],
   "notes": [
     "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
-    "element5-openapi-original.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0"
+    "element5-openapi-original.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "apis.yml register: already-registered"
   ],
   "skipped": [
     "element5-authorization-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "element5-automation-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "element5-eligibility-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "element5-object-store-api-openapi.yml: previously refined output, superseded by openapi/_original/"
   ]
