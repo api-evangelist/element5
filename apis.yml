@@ -51,7 +51,7 @@ tags:
 - Healthcare
 - Revenue Cycle Management
 - Post-Acute Care
-- Workflow-Automation
+- Workflow Automation
 - Eligibility Verification
 - Prior Authorization
 - Claims Processing
@@ -68,6 +68,7 @@ tags_raw:
 - Claims Processing
 - Webhooks
 - Artificial Intelligence
+- Workflow-Automation
 apis:
 - aid: element5:element5-authorization-api
   name: Element5 Authorization API

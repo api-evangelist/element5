@@ -49,36 +49,7 @@ webhooks:
           description: Unable to deliver the event
 components:
   schemas:
-    TaskEvents:
-      type: object
-      properties:
-        task:
-          oneOf:
-          - $ref: '#/components/schemas/TaskQueued'
-          - $ref: '#/components/schemas/TaskStarted'
-          - $ref: '#/components/schemas/TaskRestarted'
-          - $ref: '#/components/schemas/TaskProgressed'
-          - $ref: '#/components/schemas/TaskSucceeded'
-          - $ref: '#/components/schemas/TaskFailed'
-    TaskID:
-      type: string
-      format: uuid
-      example: 55dfe5e9-725a-4ce0-ba41-925e588623c2
-    SubmitEligibilityFailure:
-      type: object
-      properties:
-        submitEligibility:
-          $ref: '#/components/schemas/SubmitEligibilityFailure_submitEligibility'
-    SubmitAuthorizationProgress:
-      type: object
-      properties:
-        submitAuthorization:
-          $ref: '#/components/schemas/SubmitAuthorizationProgress_submitAuthorization'
-    TaskStatus_Failed:
-      type: string
-      enum:
-      - failed
-    TaskFailed:
+    TaskProgressed:
       type: object
       properties:
         taskId:
@@ -88,78 +59,18 @@ components:
         createdAt:
           $ref: '#/components/schemas/DateString'
         status:
-          $ref: '#/components/schemas/TaskStatus_Failed'
+          $ref: '#/components/schemas/TaskStatus_Processing'
         startedAt:
-          $ref: '#/components/schemas/DateString'
-        endedAt:
           $ref: '#/components/schemas/DateString'
         attempt:
           minimum: 1
           type: integer
         taskPayload:
-          $ref: '#/components/schemas/TaskFailures'
-    TaskName:
+          $ref: '#/components/schemas/TaskProgresses'
+    TaskID:
       type: string
-      enum:
-      - submit-authorization
-      - submit-eligibility
-    Element5Events:
-      type: string
-      enum:
-      - task#queued
-      - task#started
-      - task#restarted
-      - task#progressed
-      - task#succeeded
-      - task#failed
-    TaskFailures:
-      oneOf:
-      - $ref: '#/components/schemas/AuthorizationTaskFailures'
-      - $ref: '#/components/schemas/EligibilityTaskFailures'
-      discriminator:
-        propertyName: taskName
-        mapping:
-          submit-authorization: '#/components/schemas/AuthorizationTaskFailures'
-          submit-eligibility: '#/components/schemas/EligibilityTaskFailures'
-    TaskProgresses:
-      oneOf:
-      - $ref: '#/components/schemas/AuthorizationTaskProgresses'
-      - $ref: '#/components/schemas/EligibilityTaskProgresses'
-      discriminator:
-        propertyName: taskName
-        mapping:
-          submit-authorization: '#/components/schemas/AuthorizationTaskProgresses'
-          submit-eligibility: '#/components/schemas/EligibilityTaskProgresses'
-    DateString:
-      type: string
-      description: Date and time in ISO8601 format
-      format: date-time
-      example: '2017-07-21T17:32:28Z'
-    SubmitAuthorizationFailure:
-      type: object
-      properties:
-        submitAuthorization:
-          $ref: '#/components/schemas/SubmitAuthorizationFailure_submitAuthorization'
-    TaskStatus_Processing:
-      type: string
-      enum:
-      - processing
-    TaskStatus_Queued:
-      type: string
-      enum:
-      - queued
-    TaskSuccesses:
-      oneOf:
-      - $ref: '#/components/schemas/AuthorizationTaskSuccesses'
-      - $ref: '#/components/schemas/EligibilityTaskSuccesses'
-      discriminator:
-        propertyName: taskName
-        mapping:
-          submit-authorization: '#/components/schemas/AuthorizationTaskSuccesses'
-          submit-eligibility: '#/components/schemas/EligibilityTaskSuccesses'
-    EligibilityTaskFailures:
-      oneOf:
-      - $ref: '#/components/schemas/SubmitEligibilityFailure'
+      format: uuid
+      example: 55dfe5e9-725a-4ce0-ba41-925e588623c2
     AuthResponse:
       type: object
       properties:
@@ -324,6 +235,167 @@ components:
       - patientDetails
       - payerDetails
       - authorizationResponse
+    SubmitAuthorizationSuccess:
+      type: object
+      properties:
+        submitAuthorization:
+          $ref: '#/components/schemas/SubmitAuthorizationSuccessResponse'
+    SubmitAuthorizationProgress:
+      type: object
+      properties:
+        submitAuthorization:
+          $ref: '#/components/schemas/SubmitAuthorizationProgress_submitAuthorization'
+    TaskFailed:
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Failed'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        endedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+        taskPayload:
+          $ref: '#/components/schemas/TaskFailures'
+    EligibilityTaskSuccesses:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitEligibilitySuccessResponse'
+    SubmitEligibilityFailure:
+      type: object
+      properties:
+        submitEligibility:
+          $ref: '#/components/schemas/SubmitEligibilityFailure_submitEligibility'
+    SubmitAuthorizationFailure_submitAuthorization:
+      type: object
+      properties:
+        failureReason:
+          type: string
+    SubmitAuthorizationProgress_submitAuthorization:
+      type: object
+      properties:
+        progress:
+          type: string
+    TaskStarted:
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Processing'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+          example: 1
+    TaskEvents:
+      type: object
+      properties:
+        task:
+          oneOf:
+          - $ref: '#/components/schemas/TaskQueued'
+          - $ref: '#/components/schemas/TaskStarted'
+          - $ref: '#/components/schemas/TaskRestarted'
+          - $ref: '#/components/schemas/TaskProgressed'
+          - $ref: '#/components/schemas/TaskSucceeded'
+          - $ref: '#/components/schemas/TaskFailed'
+    TaskStatus_Queued:
+      type: string
+      enum:
+      - queued
+    TaskStatus_Success:
+      type: string
+      enum:
+      - success
+    TaskRestarted:
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/TaskID'
+        taskName:
+          $ref: '#/components/schemas/TaskName'
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        status:
+          $ref: '#/components/schemas/TaskStatus_Processing'
+        startedAt:
+          $ref: '#/components/schemas/DateString'
+        attempt:
+          minimum: 1
+          type: integer
+    SubmitEligibilityProgress:
+      type: object
+      properties:
+        submitEligibility:
+          $ref: '#/components/schemas/SubmitEligibilityProgress_submitEligibility'
+    Element5WebhookRequest:
+      type: object
+      properties:
+        eventName:
+          $ref: '#/components/schemas/Element5Events'
+        eventId:
+          type: string
+          format: uuid
+        createdAt:
+          $ref: '#/components/schemas/DateString'
+        eventPayload:
+          oneOf:
+          - $ref: '#/components/schemas/TaskEvents'
+    TaskStatus_Failed:
+      type: string
+      enum:
+      - failed
+    SubmitEligibilityFailure_submitEligibility:
+      type: object
+      properties:
+        failureReason:
+          type: string
+    AuthorizationTaskSuccesses:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitAuthorizationSuccess'
+    TaskName:
+      type: string
+      enum:
+      - submit-authorization
+      - submit-eligibility
+    TaskProgresses:
+      oneOf:
+      - $ref: '#/components/schemas/AuthorizationTaskProgresses'
+      - $ref: '#/components/schemas/EligibilityTaskProgresses'
+      discriminator:
+        propertyName: taskName
+        mapping:
+          submit-authorization: '#/components/schemas/AuthorizationTaskProgresses'
+          submit-eligibility: '#/components/schemas/EligibilityTaskProgresses'
+    SubmitAuthorizationFailure:
+      type: object
+      properties:
+        submitAuthorization:
+          $ref: '#/components/schemas/SubmitAuthorizationFailure_submitAuthorization'
+    EligibilityTaskFailures:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitEligibilityFailure'
+    TaskFailures:
+      oneOf:
+      - $ref: '#/components/schemas/AuthorizationTaskFailures'
+      - $ref: '#/components/schemas/EligibilityTaskFailures'
+      discriminator:
+        propertyName: taskName
+        mapping:
+          submit-authorization: '#/components/schemas/AuthorizationTaskFailures'
+          submit-eligibility: '#/components/schemas/EligibilityTaskFailures'
     SubmitEligibilitySuccessResponse:
       type: object
       properties:
@@ -343,6 +415,23 @@ components:
                 type: string
                 description: 'Type of the docuement. Like PDF of eligibility info from payer, PDF of member ID card if available from payer, etc. '
                 example: Eligibility PDF
+    SubmitEligibilityProgress_submitEligibility:
+      type: object
+      properties:
+        progress:
+          type: string
+    AuthorizationTaskFailures:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitAuthorizationFailure'
+    Element5Events:
+      type: string
+      enum:
+      - task#queued
+      - task#started
+      - task#restarted
+      - task#progressed
+      - task#succeeded
+      - task#failed
     EligibilityResponse:
       type: object
       properties:
@@ -838,55 +927,28 @@ components:
             required: []
       required:
       - patientDetails
-    AuthorizationTaskFailures:
-      oneOf:
-      - $ref: '#/components/schemas/SubmitAuthorizationFailure'
     SubmitAuthorizationSuccessResponse:
       type: object
       properties:
         authResponse:
           $ref: '#/components/schemas/AuthResponse'
-    AuthorizationTaskSuccesses:
-      oneOf:
-      - $ref: '#/components/schemas/SubmitAuthorizationSuccess'
-    TaskQueued:
-      type: object
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Queued'
-    AuthorizationTaskProgresses:
-      oneOf:
-      - $ref: '#/components/schemas/SubmitAuthorizationProgress'
-    SubmitAuthorizationFailure_submitAuthorization:
-      type: object
-      properties:
-        failureReason:
-          type: string
-    TaskRestarted:
-      type: object
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Processing'
-        startedAt:
-          $ref: '#/components/schemas/DateString'
-        attempt:
-          minimum: 1
-          type: integer
+    DateString:
+      type: string
+      description: Date and time in ISO8601 format
+      format: date-time
+      example: '2017-07-21T17:32:28Z'
     EligibilityTaskProgresses:
       oneOf:
       - $ref: '#/components/schemas/SubmitEligibilityProgress'
+    TaskSuccesses:
+      oneOf:
+      - $ref: '#/components/schemas/AuthorizationTaskSuccesses'
+      - $ref: '#/components/schemas/EligibilityTaskSuccesses'
+      discriminator:
+        propertyName: taskName
+        mapping:
+          submit-authorization: '#/components/schemas/AuthorizationTaskSuccesses'
+          submit-eligibility: '#/components/schemas/EligibilityTaskSuccesses'
     TaskSucceeded:
       type: object
       properties:
@@ -907,28 +969,7 @@ components:
           type: integer
         taskPayload:
           $ref: '#/components/schemas/TaskSuccesses'
-    Element5WebhookRequest:
-      type: object
-      properties:
-        eventName:
-          $ref: '#/components/schemas/Element5Events'
-        eventId:
-          type: string
-          format: uuid
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        eventPayload:
-          oneOf:
-          - $ref: '#/components/schemas/TaskEvents'
-    SubmitAuthorizationProgress_submitAuthorization:
-      type: object
-      properties:
-        progress:
-          type: string
-    EligibilityTaskSuccesses:
-      oneOf:
-      - $ref: '#/components/schemas/SubmitEligibilitySuccessResponse'
-    TaskProgressed:
+    TaskQueued:
       type: object
       properties:
         taskId:
@@ -938,55 +979,14 @@ components:
         createdAt:
           $ref: '#/components/schemas/DateString'
         status:
-          $ref: '#/components/schemas/TaskStatus_Processing'
-        startedAt:
-          $ref: '#/components/schemas/DateString'
-        attempt:
-          minimum: 1
-          type: integer
-        taskPayload:
-          $ref: '#/components/schemas/TaskProgresses'
-    SubmitAuthorizationSuccess:
-      type: object
-      properties:
-        submitAuthorization:
-          $ref: '#/components/schemas/SubmitAuthorizationSuccessResponse'
-    SubmitEligibilityProgress:
-      type: object
-      properties:
-        submitEligibility:
-          $ref: '#/components/schemas/SubmitEligibilityProgress_submitEligibility'
-    SubmitEligibilityProgress_submitEligibility:
-      type: object
-      properties:
-        progress:
-          type: string
-    TaskStatus_Success:
+          $ref: '#/components/schemas/TaskStatus_Queued'
+    AuthorizationTaskProgresses:
+      oneOf:
+      - $ref: '#/components/schemas/SubmitAuthorizationProgress'
+    TaskStatus_Processing:
       type: string
       enum:
-      - success
-    TaskStarted:
-      type: object
-      properties:
-        taskId:
-          $ref: '#/components/schemas/TaskID'
-        taskName:
-          $ref: '#/components/schemas/TaskName'
-        createdAt:
-          $ref: '#/components/schemas/DateString'
-        status:
-          $ref: '#/components/schemas/TaskStatus_Processing'
-        startedAt:
-          $ref: '#/components/schemas/DateString'
-        attempt:
-          minimum: 1
-          type: integer
-          example: 1
-    SubmitEligibilityFailure_submitEligibility:
-      type: object
-      properties:
-        failureReason:
-          type: string
+      - processing
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

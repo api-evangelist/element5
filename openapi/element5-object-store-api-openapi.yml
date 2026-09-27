@@ -147,6 +147,21 @@ paths:
       - BearerAuth: []
 components:
   schemas:
+    FileUploadPayloadTooLargeError:
+      type: object
+      description: File upload Payload Too Large Error Response
+      properties:
+        code:
+          type: string
+          description: Error code
+          example: '413'
+        message:
+          type: string
+          description: Error message
+          example: Payload too large - file exceeds maximum size
+      example:
+        code: '413'
+        message: Payload too large - file exceeds maximum size
     AuthError:
       type: object
       properties:
@@ -156,6 +171,19 @@ components:
         message:
           type: string
           example: API key is missing or invalid
+    FileUploadSuccessResponse:
+      type: object
+      description: File upload Success Response
+      properties:
+        fileObjectId:
+          type: string
+          format: uuid
+          description: File object ID
+          example: 550e8400-e29b-41d4-a716-446655440000
+        downloadUrl:
+          type: string
+          description: Unique URL to access the uploaded file
+          example: https://blob.e5.ai/store/v1/file-object/550e8400-e29b-41d4-a716-446655440000
     FileUploadBadRequestError:
       type: object
       description: File upload Bad Request Error Response
@@ -180,34 +208,6 @@ components:
         message:
           type: string
           example: Access forbidden. The API key is valid but does not have permission to access this resource.
-    FileUploadPayloadTooLargeError:
-      type: object
-      description: File upload Payload Too Large Error Response
-      properties:
-        code:
-          type: string
-          description: Error code
-          example: '413'
-        message:
-          type: string
-          description: Error message
-          example: Payload too large - file exceeds maximum size
-      example:
-        code: '413'
-        message: Payload too large - file exceeds maximum size
-    FileUploadSuccessResponse:
-      type: object
-      description: File upload Success Response
-      properties:
-        fileObjectId:
-          type: string
-          format: uuid
-          description: File object ID
-          example: 550e8400-e29b-41d4-a716-446655440000
-        downloadUrl:
-          type: string
-          description: Unique URL to access the uploaded file
-          example: https://blob.e5.ai/store/v1/file-object/550e8400-e29b-41d4-a716-446655440000
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
