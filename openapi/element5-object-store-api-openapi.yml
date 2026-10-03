@@ -147,30 +147,15 @@ paths:
       - BearerAuth: []
 components:
   schemas:
-    FileUploadPayloadTooLargeError:
-      type: object
-      description: File upload Payload Too Large Error Response
-      properties:
-        code:
-          type: string
-          description: Error code
-          example: '413'
-        message:
-          type: string
-          description: Error message
-          example: Payload too large - file exceeds maximum size
-      example:
-        code: '413'
-        message: Payload too large - file exceeds maximum size
-    AuthError:
+    AuthorizationError:
       type: object
       properties:
         code:
           type: string
-          example: '401'
+          example: '403'
         message:
           type: string
-          example: API key is missing or invalid
+          example: Access forbidden. The API key is valid but does not have permission to access this resource.
     FileUploadSuccessResponse:
       type: object
       description: File upload Success Response
@@ -199,15 +184,30 @@ components:
       example:
         code: '400'
         message: Bad request - the uploaded file is invalid or missing required data
-    AuthorizationError:
+    AuthError:
       type: object
       properties:
         code:
           type: string
-          example: '403'
+          example: '401'
         message:
           type: string
-          example: Access forbidden. The API key is valid but does not have permission to access this resource.
+          example: API key is missing or invalid
+    FileUploadPayloadTooLargeError:
+      type: object
+      description: File upload Payload Too Large Error Response
+      properties:
+        code:
+          type: string
+          description: Error code
+          example: '413'
+        message:
+          type: string
+          description: Error message
+          example: Payload too large - file exceeds maximum size
+      example:
+        code: '413'
+        message: Payload too large - file exceeds maximum size
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
