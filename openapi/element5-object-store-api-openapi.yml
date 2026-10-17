@@ -162,6 +162,24 @@ components:
       example:
         code: '400'
         message: Bad request - the uploaded file is invalid or missing required data
+    AuthorizationError:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '403'
+        message:
+          type: string
+          example: Access forbidden. The API key is valid but does not have permission to access this resource.
+    AuthError:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '401'
+        message:
+          type: string
+          example: API key is missing or invalid
     FileUploadPayloadTooLargeError:
       type: object
       description: File upload Payload Too Large Error Response
@@ -177,24 +195,6 @@ components:
       example:
         code: '413'
         message: Payload too large - file exceeds maximum size
-    AuthError:
-      type: object
-      properties:
-        code:
-          type: string
-          example: '401'
-        message:
-          type: string
-          example: API key is missing or invalid
-    AuthorizationError:
-      type: object
-      properties:
-        code:
-          type: string
-          example: '403'
-        message:
-          type: string
-          example: Access forbidden. The API key is valid but does not have permission to access this resource.
     FileUploadSuccessResponse:
       type: object
       description: File upload Success Response
