@@ -223,3 +223,9 @@ x-tagGroups:
   tags:
   - Authorization
   - Eligibility
+x-provenance:
+  method: harvested
+  publisher: Element5
+  source: https://api-doc.e5.ai/openapi.json
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
