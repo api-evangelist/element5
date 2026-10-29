@@ -64,6 +64,133 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Element5 is a company surfaced as a portfolio company of insight-partners and added to the API Evangelist network as a stub for enrichment. Sector: healthcare. This profile is a lead awaiting the enrichment pipeline.
+Element5 is a post-acute healthcare workflow automation platform that uses coordinated AI agents (Neos) to automate revenue cycle management (RCM) and back-office operations for home health, hospice, and palliative care providers. Its platform automates eligibility and benefit verification, prior authorization submission, claims processing, denials management, remittance and collections, and audit/compliance workflows, escalating only exceptions to human agents. Element5 exposes a public workflow API (Element5 API v2.2.0) protected by API keys that lets clients submit authorization and eligibility requests, process X12 270/271 eligibility transactions, upload and fetch file objects, and monitor long-running tasks via polling or webhook callbacks. The company is backed by Insight Partners and serves the post-acute care sector.
 
-Backed by: insight-partners — https://www.e5.ai/
+**Areas:** Company · Healthcare · Revenue Cycle Management · Post-Acute Care · Workflow Automation · Eligibility Verification · Prior Authorization · Claims Processing · Webhook · Artificial Intelligence
+
+## Element5 on APIs.io
+
+Everything profiled for Element5 is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/element5/](https://apis.io/providers/element5/)** — or go straight to one of the APIs or properties below.
+
+### APIs (4)
+
+- [Element5 Authorization API](https://apis.io/apis/element5/element5-authorization-api/) — Authorization related APIs
+- [Element5 Eligibility API](https://apis.io/apis/element5/element5-eligibility-api/) — Eligibility related APIs
+- [Element5 Object Store API](https://apis.io/apis/element5/element5-object-store-api/) — Object Store related APIs
+- [Element5 Automation API](https://apis.io/apis/element5/element5-automation-api/) — Generic E5 Task related APIs and Webhooks
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### Arazzo workflows (2)
+
+Multi-step workflows that chain operations into a business task.
+
+- [Element5 — Upload document and submit authorization](https://apis.io/arazzos/element5/element5-submit-authorization/)
+- [Element5 — Verify eligibility and await result](https://apis.io/arazzos/element5/element5-verify-eligibility/)
+
+#### AsyncAPI (1)
+
+Event-driven and webhook contracts.
+
+- [Element5 Webhooks](https://apis.io/asyncapis/element5/element5-webhooks/)
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [element5](https://apis.io/servers/element5/element5/)
+
+#### Agentic access (1)
+
+Which operations an agent can call, which act, and which need a human in the loop.
+
+- [Element5 Agentic Access](https://apis.io/agentic-access/element5/element5-agentic-access/)
+
+#### Collections (3)
+
+Postman and Open Collection request collections.
+
+- [Element5 Authorization API](https://apis.io/collections/element5/open-element5-authorization-api/)
+- [Element5 Authorization Eligibility API](https://apis.io/collections/element5/open-element5-eligibility-api/)
+- [Element5 Authorization Object Store API](https://apis.io/collections/element5/open-element5-object-store-api/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Element5 Openapi Overlay](https://apis.io/overlays/element5/element5-openapi-overlay/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Element5 Authentication](https://apis.io/security/element5/element5-authentication/)
+- [Element5 Domain Security](https://apis.io/security/element5/element5-domain-security/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.e5.ai/)
+- [Documentation](https://api-doc.e5.ai/)
+- [API reference](https://api-doc.e5.ai/)
+- [Blog](https://www.e5.ai/news)
+- [Compliance](https://www.e5.ai/security)
+- [Privacy policy](https://www.e5.ai/privacy-policy)
+
+## API Evangelist rating
+
+**Kin Score 42.0** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 73.2 |
+| Contract quality | 61.2 |
+| Contract governance | 18.2 |
+| Operational transparency | 7.9 |
+| Developer ergonomics | 54.2 |
+| Access clarity | 25.0 |
+
+**Agent readiness 32.2** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | verified |
+| OpenAPI Examples | partial |
+| Rate Limit Signal | — |
+| Event Surface Described | yes |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 19.1** — Health
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/element5/](https://apis.io/providers/element5/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Element5: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/element5/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
